@@ -42,7 +42,7 @@
           <button type="button" class="nav-link" data-view="notifications">Notifications</button>
           <button type="button" class="nav-link" data-view="profile">Profile</button>
           <button type="button" class="nav-link" data-view="settings">Settings</button>
-          <button type="button" class="nav-link" data-view="admin">Admin</button>
+          <a class="nav-link nav-anchor" href="admin.html">Admin</a>
         </nav>
 
         <button type="button" class="login-pill" id="accountButton" data-profile-open>♙ Login</button>
@@ -59,6 +59,10 @@
             <input id="userName" type="text" placeholder="Full name" required />
             <input id="userEmail" type="email" placeholder="Email address" required />
             <input id="userPassword" type="password" placeholder="Password" required />
+            <select id="userRole" required>
+              <option value="User">Register as User</option>
+              <option value="Admin">Register as Admin</option>
+            </select>
             <button class="primary-button" type="submit">Save Profile</button>
           </form>
         </section>
@@ -109,6 +113,11 @@
                 <span>Weekly Budget</span>
                 <strong id="profileBudget">₱0</strong>
                 <small>Current spending target</small>
+              </article>
+              <article class="stat-card">
+                <span>Account Role</span>
+                <strong id="profileRole">User</strong>
+                <small>User or admin access</small>
               </article>
             </div>
 
@@ -188,7 +197,7 @@
             <button type="button" data-view-trigger="meals">🥗<span>Meal Planning<br />Made Easy</span></button>
             <button type="button" data-view-trigger="budget">💳<span>Budget<br />Tracker</span></button>
             <button type="button" data-view-trigger="notifications">🔔<span>Expiry Alerts &<br />Reminders</span></button>
-            <button type="button" data-view-trigger="admin">📊<span>Insights &<br />Analytics</span></button>
+            <button type="button" data-admin-open>📊<span>Insights &<br />Analytics</span></button>
           </div>
 
           <div class="hero-stats">
@@ -433,6 +442,7 @@
               <p class="eyebrow">Operations</p>
               <h2>Admin Dashboard</h2>
             </div>
+            <a class="primary-button admin-page-link" href="admin.html">Open Admin Page</a>
           </div>
           <div class="stats-grid">
             <article class="stat-card">

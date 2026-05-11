@@ -74,6 +74,7 @@ const priceComparison = products.slice(0, 24).map((item, index) => ({
 
 const defaultState = {
   user: null,
+  accounts: [],
   settings: {
     diet: "Balanced",
     household: 3,
@@ -114,6 +115,20 @@ function loadState() {
 }
 
 function normalizeState(nextState) {
+  nextState.accounts = nextState.accounts || [];
+  if (nextState.user && !nextState.user.role) {
+    nextState.user.role = "User";
+  }
+  if (nextState.user && !nextState.accounts.some((account) => account.email === nextState.user.email)) {
+    nextState.accounts.push({
+      name: nextState.user.name,
+      email: nextState.user.email,
+      role: nextState.user.role || "User",
+      joinedAt: nextState.user.joinedAt || new Date().toISOString(),
+      lastLoginAt: nextState.user.lastLoginAt || new Date().toISOString()
+    });
+  }
+
   if (nextState.currency === "PHP") return nextState;
 
   nextState.currency = "PHP";
@@ -414,6 +429,7 @@ function renderProfile() {
   document.getElementById("profileHousehold").textContent = state.settings.household;
   document.getElementById("profileStore").textContent = state.settings.store;
   document.getElementById("profileBudget").textContent = formatMoney(state.budgetLimit);
+  document.getElementById("profileRole").textContent = state.user?.role || "User";
   document.getElementById("profileCartItems").textContent = getCartItemCount();
   document.getElementById("profilePantryItems").textContent = state.pantry.length;
   document.getElementById("profileAllergies").textContent = state.settings.allergies || "None";
@@ -421,11 +437,12 @@ function renderProfile() {
   if (state.user) {
     document.getElementById("userName").value = state.user.name;
     document.getElementById("userEmail").value = state.user.email;
+    document.getElementById("userRole").value = state.user.role || "User";
   }
 }
 
 function renderAdmin() {
-  document.getElementById("adminUsers").textContent = state.user ? 1 : 0;
+  document.getElementById("adminUsers").textContent = state.accounts.length || (state.user ? 1 : 0);
   document.getElementById("adminProducts").textContent = products.length;
   document.getElementById("adminProductsHero").textContent = `${products.length}+`;
   document.getElementById("activityFeed").innerHTML = state.activity.map((item) => `
@@ -449,6 +466,12 @@ function render() {
 }
 
 document.addEventListener("click", (event) => {
+  const adminButton = event.target.closest("[data-admin-open]");
+  if (adminButton) {
+    window.location.href = "admin.html";
+    return;
+  }
+
   const profileButton = event.target.closest("[data-profile-open]");
   if (profileButton) {
     if (state.user) {
@@ -479,14 +502,29 @@ if (notifyButton) {
 document.getElementById("authForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const existingJoinedAt = state.user?.joinedAt || new Date().toISOString();
+  const role = document.getElementById("userRole").value;
   state.user = {
     name: document.getElementById("userName").value,
     email: document.getElementById("userEmail").value,
+    role,
     joinedAt: existingJoinedAt,
     lastLoginAt: new Date().toISOString()
   };
+  const existingAccountIndex = state.accounts.findIndex((account) => account.email === state.user.email);
+  const account = {
+    name: state.user.name,
+    email: state.user.email,
+    role: state.user.role,
+    joinedAt: state.user.joinedAt,
+    lastLoginAt: state.user.lastLoginAt
+  };
+  if (existingAccountIndex >= 0) {
+    state.accounts[existingAccountIndex] = account;
+  } else {
+    state.accounts.push(account);
+  }
   document.getElementById("authPanel").classList.add("hidden");
-  saveState(`Profile saved for ${state.user.name}`);
+  saveState(`${state.user.role} profile saved for ${state.user.name}`);
   switchView("profile");
 });
 

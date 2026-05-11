@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - GroceryAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="admin-page">
+    <div class="page-art" aria-hidden="true">
+      <span class="ring ring-one"></span>
+      <span class="ring ring-two"></span>
+      <span class="dot dot-one"></span>
+      <span class="dot dot-two"></span>
+      <span class="leaf leaf-left"></span>
+      <span class="leaf leaf-right"></span>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-topbar">
+        <a class="brand admin-brand" href="index.html">
+          <div class="brand-mark">🛒</div>
+          <div>
+            <strong>GroceryAI</strong>
+            <span>Admin Center</span>
+          </div>
+        </a>
+        <div class="profile-actions">
+          <a class="ghost-button admin-page-link" href="index.html">Back to Website</a>
+          <button type="button" class="danger-button" id="adminLogoutButton">Logout</button>
+        </div>
+      </header>
+
+      <section class="admin-gate" id="adminGate">
+        <article class="panel">
+          <p class="eyebrow">Admin access</p>
+          <h1>Register or log in as Admin</h1>
+          <p>This page is reserved for accounts registered with the Admin role.</p>
+          <a class="primary-button admin-page-link" href="index.html">Go to Registration</a>
+        </article>
+      </section>
+
+      <section class="admin-content hidden" id="adminContent">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Operations</p>
+            <h1>Separate Admin Dashboard</h1>
+          </div>
+          <span class="pill" id="adminIdentity">Admin</span>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span>Total Accounts</span>
+            <strong id="adminAccountCount">0</strong>
+            <small>Registered users and admins</small>
+          </article>
+          <article class="stat-card">
+            <span>Admin Accounts</span>
+            <strong id="adminRoleCount">0</strong>
+            <small>Can access this page</small>
+          </article>
+          <article class="stat-card">
+            <span>User Accounts</span>
+            <strong id="userRoleCount">0</strong>
+            <small>Standard grocery profiles</small>
+          </article>
+          <article class="stat-card">
+            <span>System Health</span>
+            <strong>99%</strong>
+            <small>Demo status</small>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>Registered Accounts</h2>
+              <span class="pill" id="lastLoginLabel">Updated now</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                    <th>Last Login</th>
+                  </tr>
+                </thead>
+                <tbody id="adminAccountsTable"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>Admin Tools</h2>
+            <div class="compact-list">
+              <div class="compact-item">
+                <strong>Role-based registration</strong>
+                <span>Accounts can register as User or Admin from the main login form.</span>
+              </div>
+              <div class="compact-item">
+                <strong>Local account records</strong>
+                <span>This demo stores account records in browser localStorage.</span>
+              </div>
+              <div class="compact-item">
+                <strong>Access protection</strong>
+                <span>Only the current Admin role can view this dashboard.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="admin.js"></script>
+  </body>
+</html>
