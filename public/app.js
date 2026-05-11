@@ -61,6 +61,10 @@ const products = [
   { name: "Laundry Detergent", category: "Household", icon: "🧴", price: 11.4, nutrition: "Household supply" }
 ];
 
+products.forEach((item) => {
+  item.price = Number((item.price * 56).toFixed(2));
+});
+
 const priceComparison = products.slice(0, 24).map((item, index) => ({
   product: item.name,
   FreshMart: Number((item.price * (1 + ((index % 4) * 0.035))).toFixed(2)),
@@ -76,11 +80,12 @@ const defaultState = {
     store: "BudgetBasket",
     allergies: ""
   },
-  budgetLimit: 120,
+  currency: "PHP",
+  budgetLimit: 6500,
   grocery: [
-    { id: crypto.randomUUID(), name: "Brown Rice", qty: "2 bags", price: 8.4, category: "Grains", done: false },
-    { id: crypto.randomUUID(), name: "Spinach", qty: "3 bunches", price: 10.2, category: "Produce", done: false },
-    { id: crypto.randomUUID(), name: "Greek Yogurt", qty: "4 cups", price: 20.4, category: "Dairy", done: true }
+    { id: crypto.randomUUID(), name: "Brown Rice", qty: "2", price: 470.4, category: "Grains", done: false },
+    { id: crypto.randomUUID(), name: "Spinach", qty: "3", price: 571.2, category: "Produce", done: false },
+    { id: crypto.randomUUID(), name: "Greek Yogurt", qty: "4", price: 1142.4, category: "Dairy", done: true }
   ],
   meals: [
     { id: crypto.randomUUID(), day: "Monday", name: "Chicken rice bowls", ingredients: "Chicken, brown rice, spinach" },
@@ -102,10 +107,22 @@ function loadState() {
   if (!saved) return structuredClone(defaultState);
 
   try {
-    return { ...structuredClone(defaultState), ...JSON.parse(saved) };
+    return normalizeState({ ...structuredClone(defaultState), ...JSON.parse(saved) });
   } catch {
     return structuredClone(defaultState);
   }
+}
+
+function normalizeState(nextState) {
+  if (nextState.currency === "PHP") return nextState;
+
+  nextState.currency = "PHP";
+  nextState.budgetLimit = Number((Number(nextState.budgetLimit || defaultState.budgetLimit) * 56).toFixed(2));
+  nextState.grocery = nextState.grocery.map((item) => ({
+    ...item,
+    price: Number((Number(item.price || 0) * 56).toFixed(2))
+  }));
+  return nextState;
 }
 
 function saveState(activity) {
@@ -117,11 +134,48 @@ function saveState(activity) {
 }
 
 function formatMoney(value) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(value);
 }
 
 function getGroceryTotal() {
   return state.grocery.reduce((sum, item) => sum + Number(item.price || 0), 0);
+}
+
+function getQtyNumber(qty) {
+  const parsed = Number.parseFloat(qty);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+}
+
+function getCartItemCount() {
+  return state.grocery.reduce((sum, item) => sum + getQtyNumber(item.qty), 0);
+}
+
+function getProductQtyInCart(productName) {
+  const item = state.grocery.find((entry) => entry.name.toLowerCase() === productName.toLowerCase() && !entry.done);
+  return item ? getQtyNumber(item.qty) : 0;
+}
+
+function addProductToCart(product) {
+  const existing = state.grocery.find((entry) => entry.name.toLowerCase() === product.name.toLowerCase() && !entry.done);
+
+  if (existing) {
+    const qty = getQtyNumber(existing.qty) + 1;
+    existing.qty = String(qty);
+    existing.price = Number((product.price * qty).toFixed(2));
+    existing.category = product.category;
+    saveState(`Updated ${product.name} cart quantity to ${qty}`);
+    return;
+  }
+
+  state.grocery.push({
+    id: crypto.randomUUID(),
+    name: product.name,
+    qty: "1",
+    price: product.price,
+    category: product.category,
+    done: false
+  });
+  saveState(`Added ${product.name} to cart`);
 }
 
 function getBestPrice(row) {
@@ -267,6 +321,8 @@ function renderBudget() {
 function renderProducts() {
   const search = document.getElementById("productSearch").value.toLowerCase();
   const filtered = products.filter((item) => `${item.name} ${item.category}`.toLowerCase().includes(search));
+  document.getElementById("cartCount").textContent = `${getCartItemCount()} item${getCartItemCount() === 1 ? "" : "s"}`;
+  document.getElementById("cartTotal").textContent = formatMoney(getGroceryTotal());
   document.getElementById("productGrid").innerHTML = filtered.map((item) => `
     <article class="product-card">
       <div class="product-icon">${item.icon}</div>
@@ -276,7 +332,7 @@ function renderProducts() {
       </div>
       <div class="product-meta">
         <span>${formatMoney(item.price)}</span>
-        <button type="button" class="ghost-button" data-add-product="${item.name}">Add</button>
+        <button type="button" class="ghost-button" data-add-product="${item.name}">${getProductQtyInCart(item.name) ? `In Cart (${getProductQtyInCart(item.name)})` : "Add to Cart"}</button>
       </div>
     </article>
   `).join("");
@@ -444,15 +500,8 @@ document.getElementById("productGrid").addEventListener("click", (event) => {
   const productName = event.target.dataset.addProduct;
   if (!productName) return;
   const product = products.find((item) => item.name === productName);
-  state.grocery.push({
-    id: crypto.randomUUID(),
-    name: product.name,
-    qty: "1",
-    price: product.price,
-    category: product.category,
-    done: false
-  });
-  saveState(`Added ${product.name} from product menu`);
+  if (!product) return;
+  addProductToCart(product);
 });
 
 document.getElementById("settingsForm").addEventListener("submit", (event) => {
