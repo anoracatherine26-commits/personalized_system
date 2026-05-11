@@ -1,0 +1,22 @@
+{
+  "name": "personalized-grocery-ai-system",
+  "version": "1.0.0",
+  "description": "Personalized Grocery AI System built with Node.js for GitHub and Render deployment.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "grocery",
+    "meal-planner",
+    "pantry",
+    "budget",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

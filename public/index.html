@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personalized Grocery AI System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="brand-mark">G</div>
+          <div>
+            <strong>Grocery AI</strong>
+            <span>Personalized System</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-link active" data-view="dashboard">Dashboard</button>
+          <button class="nav-link" data-view="grocery">Grocery List</button>
+          <button class="nav-link" data-view="meals">Meal Planner</button>
+          <button class="nav-link" data-view="pantry">Pantry</button>
+          <button class="nav-link" data-view="budget">Budget</button>
+          <button class="nav-link" data-view="products">Product Menu</button>
+          <button class="nav-link" data-view="prices">Prices</button>
+          <button class="nav-link" data-view="recommendations">Recommendations</button>
+          <button class="nav-link" data-view="notifications">Notifications</button>
+          <button class="nav-link" data-view="settings">Settings</button>
+          <button class="nav-link" data-view="admin">Admin</button>
+        </nav>
+
+        <div class="sidebar-card">
+          <span>Today</span>
+          <strong id="todaySpend">$0.00</strong>
+          <small>Estimated cart total</small>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Smart shopping workspace</p>
+            <h1>Personalized Grocery AI System</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="notifyButton" aria-label="Show notifications">🔔</button>
+            <button class="primary-button" data-view-trigger="auth">Login / Register</button>
+          </div>
+        </header>
+
+        <section class="auth-panel hidden" id="authPanel">
+          <div class="auth-copy">
+            <p class="eyebrow">Secure account</p>
+            <h2>Login or create your grocery profile</h2>
+            <p>Save preferences, allergy notes, pantry history, and budget targets locally for this demo.</p>
+          </div>
+          <form class="auth-form" id="authForm">
+            <input id="userName" type="text" placeholder="Full name" required />
+            <input id="userEmail" type="email" placeholder="Email address" required />
+            <input id="userPassword" type="password" placeholder="Password" required />
+            <button class="primary-button" type="submit">Save Profile</button>
+          </form>
+        </section>
+
+        <section class="view active" id="dashboard">
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span>Grocery Items</span>
+              <strong id="itemCount">0</strong>
+              <small>Active list items</small>
+            </article>
+            <article class="stat-card">
+              <span>Pantry Stock</span>
+              <strong id="pantryCount">0</strong>
+              <small>Tracked ingredients</small>
+            </article>
+            <article class="stat-card">
+              <span>Budget Used</span>
+              <strong id="budgetUsed">0%</strong>
+              <small>Weekly grocery budget</small>
+            </article>
+            <article class="stat-card">
+              <span>Savings Found</span>
+              <strong id="savings">$0</strong>
+              <small>From price comparison</small>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel">
+              <div class="panel-heading">
+                <h2>AI Recommendations</h2>
+                <button class="ghost-button" id="refreshRecs">Refresh</button>
+              </div>
+              <div id="recommendationList" class="recommendation-list"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-heading">
+                <h2>Weekly Meals</h2>
+                <button class="ghost-button" data-view-trigger="meals">Plan</button>
+              </div>
+              <div id="mealPreview" class="compact-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="grocery">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">List manager</p>
+              <h2>Grocery List Manager</h2>
+            </div>
+          </div>
+          <form class="input-row" id="groceryForm">
+            <input id="groceryName" type="text" placeholder="Item name" required />
+            <input id="groceryQty" type="text" placeholder="Qty" required />
+            <input id="groceryPrice" type="number" min="0" step="0.01" placeholder="Price" required />
+            <button class="primary-button" type="submit">Add</button>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="groceryTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" id="meals">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Planner</p>
+              <h2>Meal Planner</h2>
+            </div>
+          </div>
+          <form class="input-row" id="mealForm">
+            <select id="mealDay">
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+              <option>Sunday</option>
+            </select>
+            <input id="mealName" type="text" placeholder="Meal name" required />
+            <input id="mealIngredients" type="text" placeholder="Ingredients" required />
+            <button class="primary-button" type="submit">Schedule</button>
+          </form>
+          <div class="meal-grid" id="mealGrid"></div>
+        </section>
+
+        <section class="view" id="pantry">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Inventory</p>
+              <h2>Pantry Tracker</h2>
+            </div>
+          </div>
+          <form class="input-row" id="pantryForm">
+            <input id="pantryName" type="text" placeholder="Ingredient" required />
+            <input id="pantryQty" type="number" min="0" placeholder="Stock" required />
+            <input id="pantryExpiry" type="date" required />
+            <button class="primary-button" type="submit">Track</button>
+          </form>
+          <div class="card-grid" id="pantryGrid"></div>
+        </section>
+
+        <section class="view" id="budget">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Spending</p>
+              <h2>Budget Tracker</h2>
+            </div>
+            <label class="budget-control">Weekly budget
+              <input id="budgetLimit" type="number" min="10" step="5" />
+            </label>
+          </div>
+          <div class="budget-meter">
+            <div id="budgetBar"></div>
+          </div>
+          <div class="dashboard-grid">
+            <article class="panel">
+              <h2>Category Spend</h2>
+              <div id="categorySpend" class="bar-list"></div>
+            </article>
+            <article class="panel">
+              <h2>Budget Advice</h2>
+              <p id="budgetAdvice" class="advice-text"></p>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="products">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Catalog</p>
+              <h2>Product Menu</h2>
+            </div>
+            <input id="productSearch" type="search" placeholder="Search products" />
+          </div>
+          <div class="product-grid" id="productGrid"></div>
+        </section>
+
+        <section class="view" id="prices">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Compare</p>
+              <h2>Price Comparison</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>FreshMart</th>
+                  <th>BudgetBasket</th>
+                  <th>GreenCart</th>
+                  <th>Best</th>
+                </tr>
+              </thead>
+              <tbody id="priceTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" id="recommendations">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Personalized picks</p>
+              <h2>Recommendations</h2>
+            </div>
+          </div>
+          <div class="card-grid" id="fullRecommendations"></div>
+        </section>
+
+        <section class="view" id="notifications">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Alerts</p>
+              <h2>Notifications</h2>
+            </div>
+          </div>
+          <div class="notification-list" id="notificationList"></div>
+        </section>
+
+        <section class="view" id="settings">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Preferences</p>
+              <h2>Settings</h2>
+            </div>
+          </div>
+          <form class="settings-grid" id="settingsForm">
+            <label>Diet preference
+              <select id="dietSetting">
+                <option>Balanced</option>
+                <option>Vegetarian</option>
+                <option>High protein</option>
+                <option>Low sugar</option>
+              </select>
+            </label>
+            <label>Household size
+              <input id="householdSetting" type="number" min="1" max="12" />
+            </label>
+            <label>Favorite store
+              <select id="storeSetting">
+                <option>FreshMart</option>
+                <option>BudgetBasket</option>
+                <option>GreenCart</option>
+              </select>
+            </label>
+            <label>Allergy notes
+              <input id="allergySetting" type="text" placeholder="Example: peanuts, shellfish" />
+            </label>
+            <button class="primary-button" type="submit">Save Settings</button>
+          </form>
+        </section>
+
+        <section class="view" id="admin">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Operations</p>
+              <h2>Admin Dashboard</h2>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span>Users</span>
+              <strong id="adminUsers">1</strong>
+              <small>Registered demo profiles</small>
+            </article>
+            <article class="stat-card">
+              <span>Products</span>
+              <strong id="adminProducts">0</strong>
+              <small>Catalog entries</small>
+            </article>
+            <article class="stat-card">
+              <span>Alerts</span>
+              <strong id="adminAlerts">0</strong>
+              <small>Active notifications</small>
+            </article>
+            <article class="stat-card">
+              <span>Health</span>
+              <strong>99%</strong>
+              <small>System uptime target</small>
+            </article>
+          </div>
+          <article class="panel">
+            <h2>Recent Activity</h2>
+            <div id="activityFeed" class="compact-list"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
