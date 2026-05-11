@@ -31,20 +31,20 @@
         </div>
 
         <nav class="nav-list">
-          <button class="nav-link active" data-view="dashboard">Home</button>
-          <button class="nav-link" data-view="products">Product Menu</button>
-          <button class="nav-link" data-view="grocery">Grocery List</button>
-          <button class="nav-link" data-view="meals">Meal Planner</button>
-          <button class="nav-link" data-view="pantry">Pantry</button>
-          <button class="nav-link" data-view="budget">Budget</button>
-          <button class="nav-link" data-view="prices">Prices</button>
-          <button class="nav-link" data-view="recommendations">Recommendations</button>
-          <button class="nav-link" data-view="notifications">Notifications</button>
-          <button class="nav-link" data-view="settings">Settings</button>
-          <button class="nav-link" data-view="admin">Admin</button>
+          <button type="button" class="nav-link active" data-view="dashboard">Home</button>
+          <button type="button" class="nav-link" data-view="products">Product Menu</button>
+          <button type="button" class="nav-link" data-view="grocery">Grocery List</button>
+          <button type="button" class="nav-link" data-view="meals">Meal Planner</button>
+          <button type="button" class="nav-link" data-view="pantry">Pantry</button>
+          <button type="button" class="nav-link" data-view="budget">Budget</button>
+          <button type="button" class="nav-link" data-view="prices">Prices</button>
+          <button type="button" class="nav-link" data-view="recommendations">Recommendations</button>
+          <button type="button" class="nav-link" data-view="notifications">Notifications</button>
+          <button type="button" class="nav-link" data-view="settings">Settings</button>
+          <button type="button" class="nav-link" data-view="admin">Admin</button>
         </nav>
 
-        <button class="login-pill" data-view-trigger="auth">♙ Login</button>
+        <button type="button" class="login-pill" data-view-trigger="auth">♙ Login</button>
       </aside>
 
       <main class="main-content">
@@ -69,7 +69,7 @@
               <h1>Personalized Grocery <span>AI</span> System</h1>
               <div class="title-flourish">⌁</div>
               <p>Your smart grocery companion that understands your preferences, suggests the best, and makes shopping easier every day.</p>
-              <button class="cta-button" data-view-trigger="products">Get Started <span>→</span></button>
+              <button type="button" class="cta-button" data-view-trigger="products">Get Started <span>→</span></button>
             </div>
 
             <div class="hero-visual" aria-label="Grocery AI hero illustration">
@@ -110,12 +110,12 @@
           </section>
 
           <div class="feature-strip">
-            <button data-view-trigger="recommendations">🧺<span>Personalized<br />Recommendations</span></button>
-            <button data-view-trigger="grocery">📋<span>Smart Grocery<br />Lists</span></button>
-            <button data-view-trigger="meals">🥗<span>Meal Planning<br />Made Easy</span></button>
-            <button data-view-trigger="budget">💳<span>Budget<br />Tracker</span></button>
-            <button data-view-trigger="notifications">🔔<span>Expiry Alerts &<br />Reminders</span></button>
-            <button data-view-trigger="admin">📊<span>Insights &<br />Analytics</span></button>
+            <button type="button" data-view-trigger="recommendations">🧺<span>Personalized<br />Recommendations</span></button>
+            <button type="button" data-view-trigger="grocery">📋<span>Smart Grocery<br />Lists</span></button>
+            <button type="button" data-view-trigger="meals">🥗<span>Meal Planning<br />Made Easy</span></button>
+            <button type="button" data-view-trigger="budget">💳<span>Budget<br />Tracker</span></button>
+            <button type="button" data-view-trigger="notifications">🔔<span>Expiry Alerts &<br />Reminders</span></button>
+            <button type="button" data-view-trigger="admin">📊<span>Insights &<br />Analytics</span></button>
           </div>
 
           <div class="hero-stats">
@@ -152,14 +152,14 @@
             <article class="panel">
               <div class="panel-heading">
                 <h2>AI Recommendations</h2>
-                <button class="ghost-button" id="refreshRecs">Refresh</button>
+                <button type="button" class="ghost-button" id="refreshRecs">Refresh</button>
               </div>
               <div id="recommendationList" class="recommendation-list"></div>
             </article>
             <article class="panel">
               <div class="panel-heading">
                 <h2>Weekly Meals</h2>
-                <button class="ghost-button" data-view-trigger="meals">Plan</button>
+                <button type="button" class="ghost-button" data-view-trigger="meals">Plan</button>
               </div>
               <div id="mealPreview" class="compact-list"></div>
             </article>

@@ -212,8 +212,8 @@ function renderGrocery() {
       <td>${item.name}</td>
       <td>${item.qty}</td>
       <td>${formatMoney(Number(item.price))}</td>
-      <td><button class="pill ${item.done ? "" : "warning"}" data-toggle-item="${item.id}">${item.done ? "Bought" : "Needed"}</button></td>
-      <td><button class="danger-button" data-delete-item="${item.id}">Remove</button></td>
+      <td><button type="button" class="pill ${item.done ? "" : "warning"}" data-toggle-item="${item.id}">${item.done ? "Bought" : "Needed"}</button></td>
+      <td><button type="button" class="danger-button" data-delete-item="${item.id}">Remove</button></td>
     </tr>
   `).join("");
 }
@@ -276,7 +276,7 @@ function renderProducts() {
       </div>
       <div class="product-meta">
         <span>${formatMoney(item.price)}</span>
-        <button class="ghost-button" data-add-product="${item.name}">Add</button>
+        <button type="button" class="ghost-button" data-add-product="${item.name}">Add</button>
       </div>
     </article>
   `).join("");
@@ -348,15 +348,17 @@ function render() {
   renderAdmin();
 }
 
-document.querySelectorAll("[data-view], [data-view-trigger]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const view = button.dataset.view || button.dataset.viewTrigger;
-    if (view === "auth") {
-      document.getElementById("authPanel").classList.toggle("hidden");
-      return;
-    }
-    switchView(view);
-  });
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-view], [data-view-trigger]");
+  if (!button) return;
+
+  const view = button.dataset.view || button.dataset.viewTrigger;
+  if (view === "auth") {
+    document.getElementById("authPanel").classList.toggle("hidden");
+    return;
+  }
+
+  switchView(view);
 });
 
 const notifyButton = document.getElementById("notifyButton");
