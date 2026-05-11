@@ -133,6 +133,16 @@ function saveState(activity) {
   render();
 }
 
+function getInitials(name) {
+  if (!name) return "GA";
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "GA";
+}
+
 function formatMoney(value) {
   return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(value);
 }
@@ -228,8 +238,14 @@ function getRecommendations() {
 }
 
 function switchView(viewId) {
+  if (viewId === "profile" && !state.user) {
+    document.getElementById("authPanel").classList.remove("hidden");
+    return;
+  }
+
   document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
   document.querySelectorAll(".nav-link").forEach((button) => button.classList.toggle("active", button.dataset.view === viewId));
+  document.getElementById("authPanel").classList.add("hidden");
 }
 
 function renderDashboard() {
@@ -381,6 +397,33 @@ function renderSettings() {
   document.getElementById("allergySetting").value = state.settings.allergies;
 }
 
+function renderProfile() {
+  const accountButton = document.getElementById("accountButton");
+  const profileName = state.user?.name || "Guest user";
+  const profileEmail = state.user?.email || "No email saved";
+  const joinedDate = state.user?.joinedAt
+    ? new Date(state.user.joinedAt).toLocaleDateString()
+    : "Profile not created yet";
+
+  accountButton.textContent = state.user ? `♙ ${profileName.split(" ")[0]}` : "♙ Login";
+  document.getElementById("profileInitials").textContent = getInitials(profileName);
+  document.getElementById("profileName").textContent = profileName;
+  document.getElementById("profileEmail").textContent = profileEmail;
+  document.getElementById("profileJoined").textContent = state.user ? `Joined ${joinedDate}` : joinedDate;
+  document.getElementById("profileDiet").textContent = state.settings.diet;
+  document.getElementById("profileHousehold").textContent = state.settings.household;
+  document.getElementById("profileStore").textContent = state.settings.store;
+  document.getElementById("profileBudget").textContent = formatMoney(state.budgetLimit);
+  document.getElementById("profileCartItems").textContent = getCartItemCount();
+  document.getElementById("profilePantryItems").textContent = state.pantry.length;
+  document.getElementById("profileAllergies").textContent = state.settings.allergies || "None";
+
+  if (state.user) {
+    document.getElementById("userName").value = state.user.name;
+    document.getElementById("userEmail").value = state.user.email;
+  }
+}
+
 function renderAdmin() {
   document.getElementById("adminUsers").textContent = state.user ? 1 : 0;
   document.getElementById("adminProducts").textContent = products.length;
@@ -401,10 +444,21 @@ function render() {
   renderRecommendations();
   renderNotifications();
   renderSettings();
+  renderProfile();
   renderAdmin();
 }
 
 document.addEventListener("click", (event) => {
+  const profileButton = event.target.closest("[data-profile-open]");
+  if (profileButton) {
+    if (state.user) {
+      switchView("profile");
+    } else {
+      document.getElementById("authPanel").classList.toggle("hidden");
+    }
+    return;
+  }
+
   const button = event.target.closest("[data-view], [data-view-trigger]");
   if (!button) return;
 
@@ -424,12 +478,28 @@ if (notifyButton) {
 
 document.getElementById("authForm").addEventListener("submit", (event) => {
   event.preventDefault();
+  const existingJoinedAt = state.user?.joinedAt || new Date().toISOString();
   state.user = {
     name: document.getElementById("userName").value,
-    email: document.getElementById("userEmail").value
+    email: document.getElementById("userEmail").value,
+    joinedAt: existingJoinedAt,
+    lastLoginAt: new Date().toISOString()
   };
   document.getElementById("authPanel").classList.add("hidden");
   saveState(`Profile saved for ${state.user.name}`);
+  switchView("profile");
+});
+
+document.getElementById("editProfileButton").addEventListener("click", () => {
+  document.getElementById("authPanel").classList.remove("hidden");
+});
+
+document.getElementById("logoutButton").addEventListener("click", () => {
+  const name = state.user?.name || "User";
+  state.user = null;
+  document.getElementById("userPassword").value = "";
+  saveState(`${name} logged out`);
+  switchView("dashboard");
 });
 
 document.getElementById("groceryForm").addEventListener("submit", (event) => {

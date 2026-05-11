@@ -40,11 +40,12 @@
           <button type="button" class="nav-link" data-view="prices">Prices</button>
           <button type="button" class="nav-link" data-view="recommendations">Recommendations</button>
           <button type="button" class="nav-link" data-view="notifications">Notifications</button>
+          <button type="button" class="nav-link" data-view="profile">Profile</button>
           <button type="button" class="nav-link" data-view="settings">Settings</button>
           <button type="button" class="nav-link" data-view="admin">Admin</button>
         </nav>
 
-        <button type="button" class="login-pill" data-view-trigger="auth">♙ Login</button>
+        <button type="button" class="login-pill" id="accountButton" data-profile-open>♙ Login</button>
       </aside>
 
       <main class="main-content">
@@ -60,6 +61,78 @@
             <input id="userPassword" type="password" placeholder="Password" required />
             <button class="primary-button" type="submit">Save Profile</button>
           </form>
+        </section>
+
+        <section class="view" id="profile">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Account</p>
+              <h2>Profile Account</h2>
+            </div>
+            <div class="profile-actions">
+              <button type="button" class="ghost-button" id="editProfileButton">Edit Profile</button>
+              <button type="button" class="danger-button" id="logoutButton">Logout</button>
+            </div>
+          </div>
+
+          <div class="profile-layout">
+            <article class="profile-card">
+              <div class="profile-avatar" id="profileInitials">GA</div>
+              <div>
+                <p class="eyebrow">Logged in as</p>
+                <h3 id="profileName">Guest user</h3>
+                <p id="profileEmail">No email saved</p>
+              </div>
+              <div class="profile-status">
+                <span class="pill">Active Account</span>
+                <small id="profileJoined">Profile not created yet</small>
+              </div>
+            </article>
+
+            <div class="profile-grid">
+              <article class="stat-card">
+                <span>Diet Preference</span>
+                <strong id="profileDiet">Balanced</strong>
+                <small>Used for recommendations</small>
+              </article>
+              <article class="stat-card">
+                <span>Household Size</span>
+                <strong id="profileHousehold">0</strong>
+                <small>Meal and grocery planning</small>
+              </article>
+              <article class="stat-card">
+                <span>Favorite Store</span>
+                <strong id="profileStore">BudgetBasket</strong>
+                <small>Default comparison store</small>
+              </article>
+              <article class="stat-card">
+                <span>Weekly Budget</span>
+                <strong id="profileBudget">₱0</strong>
+                <small>Current spending target</small>
+              </article>
+            </div>
+
+            <article class="panel">
+              <div class="panel-heading">
+                <h2>Account Summary</h2>
+                <button type="button" class="ghost-button" data-view-trigger="grocery">View Cart</button>
+              </div>
+              <div class="account-summary">
+                <div>
+                  <span>Cart Items</span>
+                  <strong id="profileCartItems">0</strong>
+                </div>
+                <div>
+                  <span>Pantry Items</span>
+                  <strong id="profilePantryItems">0</strong>
+                </div>
+                <div>
+                  <span>Allergy Notes</span>
+                  <strong id="profileAllergies">None</strong>
+                </div>
+              </div>
+            </article>
+          </div>
         </section>
 
         <section class="view active" id="dashboard">
