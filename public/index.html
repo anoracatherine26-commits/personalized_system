@@ -6,27 +6,37 @@
     <title>Personalized Grocery AI System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="page-art" aria-hidden="true">
+      <span class="ring ring-one"></span>
+      <span class="ring ring-two"></span>
+      <span class="dot dot-one"></span>
+      <span class="dot dot-two"></span>
+      <span class="dot dot-three"></span>
+      <span class="leaf leaf-left"></span>
+      <span class="leaf leaf-right"></span>
+    </div>
+
     <div class="app-shell">
       <aside class="sidebar" aria-label="Main navigation">
         <div class="brand">
-          <div class="brand-mark">G</div>
+          <div class="brand-mark">🛒</div>
           <div>
-            <strong>Grocery AI</strong>
-            <span>Personalized System</span>
+            <strong>GroceryAI</strong>
+            <span>Smart. Personal. For You.</span>
           </div>
         </div>
 
         <nav class="nav-list">
-          <button class="nav-link active" data-view="dashboard">Dashboard</button>
+          <button class="nav-link active" data-view="dashboard">Home</button>
+          <button class="nav-link" data-view="products">Product Menu</button>
           <button class="nav-link" data-view="grocery">Grocery List</button>
           <button class="nav-link" data-view="meals">Meal Planner</button>
           <button class="nav-link" data-view="pantry">Pantry</button>
           <button class="nav-link" data-view="budget">Budget</button>
-          <button class="nav-link" data-view="products">Product Menu</button>
           <button class="nav-link" data-view="prices">Prices</button>
           <button class="nav-link" data-view="recommendations">Recommendations</button>
           <button class="nav-link" data-view="notifications">Notifications</button>
@@ -34,25 +44,10 @@
           <button class="nav-link" data-view="admin">Admin</button>
         </nav>
 
-        <div class="sidebar-card">
-          <span>Today</span>
-          <strong id="todaySpend">$0.00</strong>
-          <small>Estimated cart total</small>
-        </div>
+        <button class="login-pill" data-view-trigger="auth">♙ Login</button>
       </aside>
 
       <main class="main-content">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">Smart shopping workspace</p>
-            <h1>Personalized Grocery AI System</h1>
-          </div>
-          <div class="topbar-actions">
-            <button class="icon-button" id="notifyButton" aria-label="Show notifications">🔔</button>
-            <button class="primary-button" data-view-trigger="auth">Login / Register</button>
-          </div>
-        </header>
-
         <section class="auth-panel hidden" id="authPanel">
           <div class="auth-copy">
             <p class="eyebrow">Secure account</p>
@@ -68,6 +63,68 @@
         </section>
 
         <section class="view active" id="dashboard">
+          <section class="hero-section">
+            <div class="hero-copy">
+              <div class="hero-badge">AI-Powered <span></span> Smart <span></span> Personalized</div>
+              <h1>Personalized Grocery <span>AI</span> System</h1>
+              <div class="title-flourish">⌁</div>
+              <p>Your smart grocery companion that understands your preferences, suggests the best, and makes shopping easier every day.</p>
+              <button class="cta-button" data-view-trigger="products">Get Started <span>→</span></button>
+            </div>
+
+            <div class="hero-visual" aria-label="Grocery AI hero illustration">
+              <div class="phone-card">
+                <strong>Hello, Sarah! 👋</strong>
+                <span>What would you like to cook today?</span>
+                <div class="phone-search">Search groceries, recipes...</div>
+                <div class="phone-row">
+                  <div><b>🍌</b><small>Banana</small></div>
+                  <div><b>🥛</b><small>Milk</small></div>
+                  <div><b>🌾</b><small>Quinoa</small></div>
+                </div>
+                <div class="meal-mini">
+                  <b>🥗</b>
+                  <span>Veggie Salad<br /><small>20 min · Easy</small></span>
+                </div>
+              </div>
+              <div class="bag">
+                <div class="groceries">
+                  <span>🥬</span>
+                  <span>🥖</span>
+                  <span>🥦</span>
+                  <span>🥛</span>
+                  <span>🍅</span>
+                  <span>🫑</span>
+                </div>
+                <div class="bag-label">Smart Choices<br />Healthy Life</div>
+              </div>
+              <div class="bot-card">
+                <div class="bot-face">AI</div>
+                <span>Hi! I'm your AI Grocery Assistant.</span>
+              </div>
+              <div class="saving-card">
+                <strong>Budget Friendly</strong>
+                <span>You're saving $12</span>
+              </div>
+            </div>
+          </section>
+
+          <div class="feature-strip">
+            <button data-view-trigger="recommendations">🧺<span>Personalized<br />Recommendations</span></button>
+            <button data-view-trigger="grocery">📋<span>Smart Grocery<br />Lists</span></button>
+            <button data-view-trigger="meals">🥗<span>Meal Planning<br />Made Easy</span></button>
+            <button data-view-trigger="budget">💳<span>Budget<br />Tracker</span></button>
+            <button data-view-trigger="notifications">🔔<span>Expiry Alerts &<br />Reminders</span></button>
+            <button data-view-trigger="admin">📊<span>Insights &<br />Analytics</span></button>
+          </div>
+
+          <div class="hero-stats">
+            <div><strong>10K+</strong><span>Happy Users</span></div>
+            <div><strong id="adminProductsHero">0</strong><span>Products</span></div>
+            <div><strong>5K+</strong><span>Recipes</span></div>
+            <div><strong>98%</strong><span>Satisfaction</span></div>
+          </div>
+
           <div class="stats-grid">
             <article class="stat-card">
               <span>Grocery Items</span>
