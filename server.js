@@ -1,9 +1,11 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const PORT = process.env.PORT || 10000;
 
-const PORT = process.env.PORT || 3000;
-const publicDir = path.join(__dirname, "public");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
