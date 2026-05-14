@@ -1,80 +1,77 @@
 const storageKey = "personalized-grocery-ai-state";
 
-const products = [
-  { name: "Organic Banana", category: "Produce", icon: "🍌", price: 1.2, nutrition: "Potassium rich snack" },
-  { name: "Red Apples", category: "Produce", icon: "🍎", price: 3.8, nutrition: "Crisp fruit for snacks" },
-  { name: "Avocado", category: "Produce", icon: "🥑", price: 2.4, nutrition: "Healthy fats" },
-  { name: "Broccoli", category: "Produce", icon: "🥦", price: 2.9, nutrition: "Vitamin C and fiber" },
-  { name: "Spinach", category: "Produce", icon: "🥬", price: 3.4, nutrition: "Iron and folate" },
-  { name: "Romaine Lettuce", category: "Produce", icon: "🥬", price: 2.6, nutrition: "Fresh salad base" },
-  { name: "Tomatoes", category: "Produce", icon: "🍅", price: 2.7, nutrition: "Bright sauce and salad staple" },
-  { name: "Bell Peppers", category: "Produce", icon: "🫑", price: 3.2, nutrition: "Colorful vitamin boost" },
-  { name: "Carrots", category: "Produce", icon: "🥕", price: 2.1, nutrition: "Crunchy beta-carotene" },
-  { name: "Potatoes", category: "Produce", icon: "🥔", price: 3.1, nutrition: "Budget friendly starch" },
-  { name: "Sweet Corn", category: "Produce", icon: "🌽", price: 2.5, nutrition: "Quick side dish" },
-  { name: "Mushrooms", category: "Produce", icon: "🍄", price: 3.7, nutrition: "Savory meatless option" },
-  { name: "Strawberries", category: "Fruit", icon: "🍓", price: 5.2, nutrition: "Dessert and smoothie fruit" },
-  { name: "Blueberries", category: "Fruit", icon: "🫐", price: 4.9, nutrition: "Antioxidant snack" },
-  { name: "Oranges", category: "Fruit", icon: "🍊", price: 3.6, nutrition: "Vitamin C" },
-  { name: "Grapes", category: "Fruit", icon: "🍇", price: 4.4, nutrition: "Easy lunchbox fruit" },
-  { name: "Watermelon", category: "Fruit", icon: "🍉", price: 6.8, nutrition: "Hydrating family fruit" },
-  { name: "Whole Milk", category: "Dairy", icon: "🥛", price: 4.6, nutrition: "Calcium and protein" },
-  { name: "Almond Milk", category: "Dairy", icon: "🥛", price: 2.4, nutrition: "Dairy-free beverage" },
-  { name: "Greek Yogurt", category: "Dairy", icon: "🥣", price: 5.1, nutrition: "Protein and probiotics" },
-  { name: "Cheddar Cheese", category: "Dairy", icon: "🧀", price: 4.8, nutrition: "Sandwich and snack staple" },
-  { name: "Butter", category: "Dairy", icon: "🧈", price: 3.9, nutrition: "Baking essential" },
-  { name: "Eggs", category: "Protein", icon: "🥚", price: 4.7, nutrition: "Versatile breakfast protein" },
-  { name: "Chicken Breast", category: "Protein", icon: "🍗", price: 8.9, nutrition: "Lean protein" },
-  { name: "Ground Beef", category: "Protein", icon: "🥩", price: 7.6, nutrition: "Dinner protein" },
-  { name: "Pork Chops", category: "Protein", icon: "🥩", price: 7.2, nutrition: "High protein entree" },
-  { name: "Tofu", category: "Protein", icon: "◻️", price: 3.3, nutrition: "Plant protein" },
-  { name: "Black Beans", category: "Protein", icon: "🫘", price: 1.8, nutrition: "Fiber and protein" },
-  { name: "Salmon Fillet", category: "Seafood", icon: "🐟", price: 12.5, nutrition: "Omega-3 source" },
-  { name: "Shrimp", category: "Seafood", icon: "🍤", price: 10.7, nutrition: "Quick seafood protein" },
-  { name: "Tuna Cans", category: "Seafood", icon: "🥫", price: 4.5, nutrition: "Pantry seafood" },
-  { name: "Brown Rice", category: "Grains", icon: "🍚", price: 4.2, nutrition: "Fiber rich pantry staple" },
-  { name: "White Rice", category: "Grains", icon: "🍚", price: 3.7, nutrition: "Everyday staple" },
-  { name: "Quinoa 1kg", category: "Grains", icon: "🌾", price: 3.5, nutrition: "Complete grain protein" },
-  { name: "Rolled Oats", category: "Grains", icon: "🥣", price: 3.2, nutrition: "Breakfast staple" },
-  { name: "Whole Wheat Bread", category: "Bakery", icon: "🍞", price: 3.6, nutrition: "Whole grain option" },
-  { name: "Baguette", category: "Bakery", icon: "🥖", price: 2.8, nutrition: "Soup and sandwich bread" },
-  { name: "Bagels", category: "Bakery", icon: "🥯", price: 4.1, nutrition: "Breakfast bread" },
-  { name: "Pasta", category: "Pantry", icon: "🍝", price: 2.2, nutrition: "Fast dinner base" },
-  { name: "Tomato Sauce", category: "Pantry", icon: "🥫", price: 2.3, nutrition: "Pasta night essential" },
-  { name: "Olive Oil", category: "Pantry", icon: "🫒", price: 8.4, nutrition: "Cooking oil" },
-  { name: "Peanut Butter", category: "Pantry", icon: "🥜", price: 4.2, nutrition: "Protein spread" },
-  { name: "Honey", category: "Pantry", icon: "🍯", price: 5.6, nutrition: "Natural sweetener" },
-  { name: "Granola", category: "Breakfast", icon: "🥣", price: 4.7, nutrition: "Crunchy breakfast topper" },
-  { name: "Cereal", category: "Breakfast", icon: "🥣", price: 4.3, nutrition: "Family breakfast" },
-  { name: "Coffee Beans", category: "Beverage", icon: "☕", price: 9.5, nutrition: "Morning drink" },
-  { name: "Green Tea", category: "Beverage", icon: "🍵", price: 4.9, nutrition: "Light caffeine option" },
-  { name: "Orange Juice", category: "Beverage", icon: "🧃", price: 4.1, nutrition: "Breakfast drink" },
-  { name: "Sparkling Water", category: "Beverage", icon: "💧", price: 3.9, nutrition: "Sugar-free drink" },
-  { name: "Frozen Peas", category: "Frozen", icon: "🟢", price: 2.6, nutrition: "Quick vegetable side" },
-  { name: "Frozen Berries", category: "Frozen", icon: "🫐", price: 5.9, nutrition: "Smoothie fruit" },
-  { name: "Pizza Dough", category: "Frozen", icon: "🍕", price: 3.8, nutrition: "Easy pizza night" },
-  { name: "Mixed Nuts", category: "Snacks", icon: "🥜", price: 6.7, nutrition: "Energy snack" },
-  { name: "Dark Chocolate", category: "Snacks", icon: "🍫", price: 3.4, nutrition: "Sweet treat" },
-  { name: "Crackers", category: "Snacks", icon: "🫓", price: 2.9, nutrition: "Cheese board snack" },
-  { name: "Dish Soap", category: "Household", icon: "🧼", price: 3.3, nutrition: "Kitchen cleaning" },
-  { name: "Paper Towels", category: "Household", icon: "🧻", price: 6.2, nutrition: "Cleanup essential" },
-  { name: "Laundry Detergent", category: "Household", icon: "🧴", price: 11.4, nutrition: "Household supply" }
+const defaultProducts = [
+  { name: "Organic Banana", category: "Produce", icon: "🍌", price: 67.2, nutrition: "Potassium rich snack" },
+  { name: "Red Apples", category: "Produce", icon: "🍎", price: 212.8, nutrition: "Crisp fruit for snacks" },
+  { name: "Avocado", category: "Produce", icon: "🥑", price: 134.4, nutrition: "Healthy fats" },
+  { name: "Broccoli", category: "Produce", icon: "🥦", price: 162.4, nutrition: "Vitamin C and fiber" },
+  { name: "Spinach", category: "Produce", icon: "🥬", price: 190.4, nutrition: "Iron and folate" },
+  { name: "Romaine Lettuce", category: "Produce", icon: "🥬", price: 145.6, nutrition: "Fresh salad base" },
+  { name: "Tomatoes", category: "Produce", icon: "🍅", price: 151.2, nutrition: "Bright sauce and salad staple" },
+  { name: "Bell Peppers", category: "Produce", icon: "🫑", price: 179.2, nutrition: "Colorful vitamin boost" },
+  { name: "Carrots", category: "Produce", icon: "🥕", price: 117.6, nutrition: "Crunchy beta-carotene" },
+  { name: "Potatoes", category: "Produce", icon: "🥔", price: 173.6, nutrition: "Budget friendly starch" },
+  { name: "Sweet Corn", category: "Produce", icon: "🌽", price: 140.0, nutrition: "Quick side dish" },
+  { name: "Mushrooms", category: "Produce", icon: "🍄", price: 207.2, nutrition: "Savory meatless option" },
+  { name: "Strawberries", category: "Fruit", icon: "🍓", price: 291.2, nutrition: "Dessert and smoothie fruit" },
+  { name: "Blueberries", category: "Fruit", icon: "🫐", price: 274.4, nutrition: "Antioxidant snack" },
+  { name: "Oranges", category: "Fruit", icon: "🍊", price: 201.6, nutrition: "Vitamin C" },
+  { name: "Grapes", category: "Fruit", icon: "🍇", price: 246.4, nutrition: "Easy lunchbox fruit" },
+  { name: "Watermelon", category: "Fruit", icon: "🍉", price: 380.8, nutrition: "Hydrating family fruit" },
+  { name: "Whole Milk", category: "Dairy", icon: "🥛", price: 257.6, nutrition: "Calcium and protein" },
+  { name: "Almond Milk", category: "Dairy", icon: "🥛", price: 134.4, nutrition: "Dairy-free beverage" },
+  { name: "Greek Yogurt", category: "Dairy", icon: "🥣", price: 285.6, nutrition: "Protein and probiotics" },
+  { name: "Cheddar Cheese", category: "Dairy", icon: "🧀", price: 268.8, nutrition: "Sandwich and snack staple" },
+  { name: "Butter", category: "Dairy", icon: "🧈", price: 218.4, nutrition: "Baking essential" },
+  { name: "Eggs", category: "Protein", icon: "🥚", price: 263.2, nutrition: "Versatile breakfast protein" },
+  { name: "Chicken Breast", category: "Protein", icon: "🍗", price: 498.4, nutrition: "Lean protein" },
+  { name: "Ground Beef", category: "Protein", icon: "🥩", price: 425.6, nutrition: "Dinner protein" },
+  { name: "Pork Chops", category: "Protein", icon: "🥩", price: 403.2, nutrition: "High protein entree" },
+  { name: "Tofu", category: "Protein", icon: "◻️", price: 184.8, nutrition: "Plant protein" },
+  { name: "Black Beans", category: "Protein", icon: "🫘", price: 100.8, nutrition: "Fiber and protein" },
+  { name: "Salmon Fillet", category: "Seafood", icon: "🐟", price: 700.0, nutrition: "Omega-3 source" },
+  { name: "Shrimp", category: "Seafood", icon: "🍤", price: 599.2, nutrition: "Quick seafood protein" },
+  { name: "Tuna Cans", category: "Seafood", icon: "🥫", price: 252.0, nutrition: "Pantry seafood" },
+  { name: "Brown Rice", category: "Grains", icon: "🍚", price: 235.2, nutrition: "Fiber rich pantry staple" },
+  { name: "White Rice", category: "Grains", icon: "🍚", price: 207.2, nutrition: "Everyday staple" },
+  { name: "Quinoa 1kg", category: "Grains", icon: "🌾", price: 196.0, nutrition: "Complete grain protein" },
+  { name: "Rolled Oats", category: "Grains", icon: "🥣", price: 179.2, nutrition: "Breakfast staple" },
+  { name: "Whole Wheat Bread", category: "Bakery", icon: "🍞", price: 201.6, nutrition: "Whole grain option" },
+  { name: "Baguette", category: "Bakery", icon: "🥖", price: 156.8, nutrition: "Soup and sandwich bread" },
+  { name: "Bagels", category: "Bakery", icon: "🥯", price: 229.6, nutrition: "Breakfast bread" },
+  { name: "Pasta", category: "Pantry", icon: "🍝", price: 123.2, nutrition: "Fast dinner base" },
+  { name: "Tomato Sauce", category: "Pantry", icon: "🥫", price: 128.8, nutrition: "Pasta night essential" },
+  { name: "Olive Oil", category: "Pantry", icon: "🫒", price: 470.4, nutrition: "Cooking oil" },
+  { name: "Peanut Butter", category: "Pantry", icon: "🥜", price: 235.2, nutrition: "Protein spread" },
+  { name: "Honey", category: "Pantry", icon: "🍯", price: 313.6, nutrition: "Natural sweetener" },
+  { name: "Granola", category: "Breakfast", icon: "🥣", price: 263.2, nutrition: "Crunchy breakfast topper" },
+  { name: "Cereal", category: "Breakfast", icon: "🥣", price: 240.8, nutrition: "Family breakfast" },
+  { name: "Coffee Beans", category: "Beverage", icon: "☕", price: 532.0, nutrition: "Morning drink" },
+  { name: "Green Tea", category: "Beverage", icon: "🍵", price: 274.4, nutrition: "Light caffeine option" },
+  { name: "Orange Juice", category: "Beverage", icon: "🧃", price: 229.6, nutrition: "Breakfast drink" },
+  { name: "Sparkling Water", category: "Beverage", icon: "💧", price: 218.4, nutrition: "Sugar-free drink" },
+  { name: "Frozen Peas", category: "Frozen", icon: "🟢", price: 145.6, nutrition: "Quick vegetable side" },
+  { name: "Frozen Berries", category: "Frozen", icon: "🫐", price: 330.4, nutrition: "Smoothie fruit" },
+  { name: "Pizza Dough", category: "Frozen", icon: "🍕", price: 212.8, nutrition: "Easy pizza night" },
+  { name: "Mixed Nuts", category: "Snacks", icon: "🥜", price: 375.2, nutrition: "Energy snack" },
+  { name: "Dark Chocolate", category: "Snacks", icon: "🍫", price: 190.4, nutrition: "Sweet treat" },
+  { name: "Crackers", category: "Snacks", icon: "🫓", price: 162.4, nutrition: "Cheese board snack" },
+  { name: "Dish Soap", category: "Household", icon: "🧼", price: 184.8, nutrition: "Kitchen cleaning" },
+  { name: "Paper Towels", category: "Household", icon: "🧻", price: 347.2, nutrition: "Cleanup essential" },
+  { name: "Laundry Detergent", category: "Household", icon: "🧴", price: 638.4, nutrition: "Household supply" }
 ];
 
-products.forEach((item) => {
-  item.price = Number((item.price * 56).toFixed(2));
-});
-
-const priceComparison = products.slice(0, 24).map((item, index) => ({
-  product: item.name,
-  FreshMart: Number((item.price * (1 + ((index % 4) * 0.035))).toFixed(2)),
-  BudgetBasket: Number((item.price * 0.93).toFixed(2)),
-  GreenCart: Number((item.price * (0.96 + ((index % 3) * 0.025))).toFixed(2))
+const priceComparison = defaultProducts.slice(0, 14).map((product, index) => ({
+  product: product.name,
+  FreshMart: Number((product.price * (1 + ((index % 4) * 0.035))).toFixed(2)),
+  BudgetBasket: Number((product.price * (0.92 + ((index % 3) * 0.025))).toFixed(2)),
+  GreenCart: Number((product.price * (0.96 + ((index % 5) * 0.02))).toFixed(2))
 }));
 
 const defaultState = {
   user: null,
   accounts: [],
+  products: defaultProducts,
   settings: {
     diet: "Balanced",
     household: 3,
@@ -116,6 +113,7 @@ function loadState() {
 
 function normalizeState(nextState) {
   nextState.accounts = nextState.accounts || [];
+  nextState.products = nextState.products || defaultProducts;
   if (nextState.user && !nextState.user.role) {
     nextState.user.role = "User";
   }
@@ -239,7 +237,7 @@ function getNotifications() {
 function getRecommendations() {
   const pantryNames = new Set(state.pantry.map((item) => item.name.toLowerCase()));
   const groceryNames = new Set(state.grocery.map((item) => item.name.toLowerCase()));
-  const base = products
+  const base = state.products
     .filter((product) => !pantryNames.has(product.name.toLowerCase()) && !groceryNames.has(product.name.toLowerCase()))
     .slice(0, 5);
 
@@ -254,13 +252,26 @@ function getRecommendations() {
 
 function switchView(viewId) {
   if (viewId === "profile" && !state.user) {
-    document.getElementById("authPanel").classList.remove("hidden");
+    window.location.href = "login.html";
     return;
   }
 
   document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
   document.querySelectorAll(".nav-link").forEach((button) => button.classList.toggle("active", button.dataset.view === viewId));
-  document.getElementById("authPanel").classList.add("hidden");
+}
+
+function openFeatureGuide() {
+  const modal = document.getElementById("featureGuideModal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeFeatureGuide() {
+  const modal = document.getElementById("featureGuideModal");
+  if (!modal) return;
+  modal.classList.add("hidden");
+  modal.setAttribute("aria-hidden", "true");
 }
 
 function renderDashboard() {
@@ -275,6 +286,7 @@ function renderDashboard() {
   document.getElementById("pantryCount").textContent = state.pantry.length;
   document.getElementById("budgetUsed").textContent = `${budgetPercent}%`;
   document.getElementById("savings").textContent = formatMoney(bestSavings);
+  document.getElementById("adminProductsHero").textContent = state.products.length;
 
   document.getElementById("recommendationList").innerHTML = getRecommendations().slice(0, 3).map((item) => `
     <div class="recommendation-mini">
@@ -351,7 +363,7 @@ function renderBudget() {
 
 function renderProducts() {
   const search = document.getElementById("productSearch").value.toLowerCase();
-  const filtered = products.filter((item) => `${item.name} ${item.category}`.toLowerCase().includes(search));
+  const filtered = state.products.filter((item) => `${item.name} ${item.category}`.toLowerCase().includes(search));
   document.getElementById("cartCount").textContent = `${getCartItemCount()} item${getCartItemCount() === 1 ? "" : "s"}`;
   document.getElementById("cartTotal").textContent = formatMoney(getGroceryTotal());
   document.getElementById("productGrid").innerHTML = filtered.map((item) => `
@@ -402,7 +414,6 @@ function renderNotifications() {
       <p>${notice.body}</p>
     </article>
   `).join("");
-  document.getElementById("adminAlerts").textContent = notices.length;
 }
 
 function renderSettings() {
@@ -414,13 +425,23 @@ function renderSettings() {
 
 function renderProfile() {
   const accountButton = document.getElementById("accountButton");
+  const adminLink = document.getElementById("adminDashboardLink");
+  const adminOnlyProductForm = document.getElementById("addProductForm");
   const profileName = state.user?.name || "Guest user";
   const profileEmail = state.user?.email || "No email saved";
   const joinedDate = state.user?.joinedAt
     ? new Date(state.user.joinedAt).toLocaleDateString()
     : "Profile not created yet";
 
-  accountButton.textContent = state.user ? `♙ ${profileName.split(" ")[0]}` : "♙ Login";
+  if (accountButton) {
+    accountButton.textContent = state.user ? profileName.split(" ")[0] : "Login";
+  }
+  if (adminLink) {
+    adminLink.classList.toggle("hidden", state.user?.role !== "Admin");
+  }
+  if (adminOnlyProductForm) {
+    adminOnlyProductForm.classList.toggle("hidden", state.user?.role !== "Admin");
+  }
   document.getElementById("profileInitials").textContent = getInitials(profileName);
   document.getElementById("profileName").textContent = profileName;
   document.getElementById("profileEmail").textContent = profileEmail;
@@ -434,20 +455,6 @@ function renderProfile() {
   document.getElementById("profilePantryItems").textContent = state.pantry.length;
   document.getElementById("profileAllergies").textContent = state.settings.allergies || "None";
 
-  if (state.user) {
-    document.getElementById("userName").value = state.user.name;
-    document.getElementById("userEmail").value = state.user.email;
-    document.getElementById("userRole").value = state.user.role || "User";
-  }
-}
-
-function renderAdmin() {
-  document.getElementById("adminUsers").textContent = state.accounts.length || (state.user ? 1 : 0);
-  document.getElementById("adminProducts").textContent = products.length;
-  document.getElementById("adminProductsHero").textContent = `${products.length}+`;
-  document.getElementById("activityFeed").innerHTML = state.activity.map((item) => `
-    <div class="compact-item"><strong>${item}</strong><span>${new Date().toLocaleDateString()}</span></div>
-  `).join("");
 }
 
 function render() {
@@ -462,22 +469,15 @@ function render() {
   renderNotifications();
   renderSettings();
   renderProfile();
-  renderAdmin();
 }
 
 document.addEventListener("click", (event) => {
-  const adminButton = event.target.closest("[data-admin-open]");
-  if (adminButton) {
-    window.location.href = "admin.html";
-    return;
-  }
-
   const profileButton = event.target.closest("[data-profile-open]");
   if (profileButton) {
     if (state.user) {
       switchView("profile");
     } else {
-      document.getElementById("authPanel").classList.toggle("hidden");
+      window.location.href = "login.html";
     }
     return;
   }
@@ -487,7 +487,7 @@ document.addEventListener("click", (event) => {
 
   const view = button.dataset.view || button.dataset.viewTrigger;
   if (view === "auth") {
-    document.getElementById("authPanel").classList.toggle("hidden");
+    window.location.href = "login.html";
     return;
   }
 
@@ -499,51 +499,45 @@ if (notifyButton) {
   notifyButton.addEventListener("click", () => switchView("notifications"));
 }
 
-document.getElementById("authForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const existingJoinedAt = state.user?.joinedAt || new Date().toISOString();
-  const role = document.getElementById("userRole").value;
-  state.user = {
-    name: document.getElementById("userName").value,
-    email: document.getElementById("userEmail").value,
-    role,
-    joinedAt: existingJoinedAt,
-    lastLoginAt: new Date().toISOString()
-  };
-  const existingAccountIndex = state.accounts.findIndex((account) => account.email === state.user.email);
-  const account = {
-    name: state.user.name,
-    email: state.user.email,
-    role: state.user.role,
-    joinedAt: state.user.joinedAt,
-    lastLoginAt: state.user.lastLoginAt
-  };
-  if (existingAccountIndex >= 0) {
-    state.accounts[existingAccountIndex] = account;
-  } else {
-    state.accounts.push(account);
-  }
-  document.getElementById("authPanel").classList.add("hidden");
-  saveState(`${state.user.role} profile saved for ${state.user.name}`);
-  switchView("profile");
-});
+const featureGuideButton = document.getElementById("featureGuideButton");
+if (featureGuideButton) {
+  featureGuideButton.addEventListener("click", openFeatureGuide);
+}
+
+const heroFeatureButton = document.getElementById("heroFeatureButton");
+if (heroFeatureButton) {
+  heroFeatureButton.addEventListener("click", openFeatureGuide);
+}
+
+const closeFeatureGuideButton = document.getElementById("closeFeatureGuide");
+if (closeFeatureGuideButton) {
+  closeFeatureGuideButton.addEventListener("click", closeFeatureGuide);
+}
+
+const featureGuideModal = document.getElementById("featureGuideModal");
+if (featureGuideModal) {
+  featureGuideModal.addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) {
+      closeFeatureGuide();
+    }
+  });
+}
 
 document.getElementById("editProfileButton").addEventListener("click", () => {
-  document.getElementById("authPanel").classList.remove("hidden");
+  window.location.href = "login.html";
 });
 
 document.getElementById("logoutButton").addEventListener("click", () => {
   const name = state.user?.name || "User";
   state.user = null;
-  document.getElementById("userPassword").value = "";
   saveState(`${name} logged out`);
-  switchView("dashboard");
+  window.location.href = "login.html";
 });
 
 document.getElementById("groceryForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const name = document.getElementById("groceryName").value.trim();
-  const product = products.find((item) => item.name.toLowerCase() === name.toLowerCase());
+  const product = state.products.find((item) => item.name.toLowerCase() === name.toLowerCase());
   state.grocery.push({
     id: crypto.randomUUID(),
     name,
@@ -607,7 +601,7 @@ document.getElementById("productSearch").addEventListener("input", renderProduct
 document.getElementById("productGrid").addEventListener("click", (event) => {
   const productName = event.target.dataset.addProduct;
   if (!productName) return;
-  const product = products.find((item) => item.name === productName);
+  const product = state.products.find((item) => item.name === productName);
   if (!product) return;
   addProductToCart(product);
 });
@@ -625,6 +619,71 @@ document.getElementById("settingsForm").addEventListener("submit", (event) => {
 
 document.getElementById("refreshRecs").addEventListener("click", () => {
   saveState("Recommendations refreshed");
+});
+
+document.getElementById("addProductForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = document.getElementById("productName").value.trim();
+  const category = document.getElementById("productCategory").value;
+  const price = Number(document.getElementById("productPrice").value);
+  const icon = document.getElementById("productIcon").value;
+  const nutrition = document.getElementById("productNutrition").value;
+
+  // Check if product already exists
+  if (state.products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+    alert("A product with this name already exists!");
+    return;
+  }
+
+  state.products.push({
+    name,
+    category,
+    price,
+    icon,
+    nutrition
+  });
+
+  // Clear form
+  document.getElementById("addProductForm").reset();
+  saveState(`Added ${name} to product catalog`);
+});
+
+document.getElementById("generateReceiptButton").addEventListener("click", () => {
+  const purchasedItems = state.grocery.filter(item => item.done);
+  if (purchasedItems.length === 0) {
+    alert("No purchased items to generate receipt for!");
+    return;
+  }
+
+  const total = purchasedItems.reduce((sum, item) => sum + Number(item.price), 0);
+  const customerName = state.user?.name || "Guest";
+
+  document.getElementById("receiptDate").textContent = new Date().toLocaleDateString();
+  document.getElementById("receiptCustomer").textContent = customerName;
+  document.getElementById("receiptItemsTable").innerHTML = purchasedItems.map(item => `
+    <tr>
+      <td>${item.name}</td>
+      <td>${item.qty}</td>
+      <td>${formatMoney(item.price / getQtyNumber(item.qty))}</td>
+      <td>${formatMoney(item.price)}</td>
+    </tr>
+  `).join("");
+  document.getElementById("receiptTotal").textContent = formatMoney(total);
+
+  saveState(`Generated receipt for ${purchasedItems.length} items`);
+});
+
+document.getElementById("clearPurchasedButton").addEventListener("click", () => {
+  const purchasedCount = state.grocery.filter(item => item.done).length;
+  if (purchasedCount === 0) {
+    alert("No purchased items to clear!");
+    return;
+  }
+
+  if (confirm(`Clear ${purchasedCount} purchased items from the list?`)) {
+    state.grocery = state.grocery.filter(item => !item.done);
+    saveState(`Cleared ${purchasedCount} purchased items`);
+  }
 });
 
 render();

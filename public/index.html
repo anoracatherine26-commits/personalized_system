@@ -10,6 +10,13 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <script>
+      const storageKey = "personalized-grocery-ai-state";
+      const state = JSON.parse(localStorage.getItem(storageKey)) || {};
+      if (!state.user) {
+        window.location.href = "login.html";
+      }
+    </script>
     <div class="page-art" aria-hidden="true">
       <span class="ring ring-one"></span>
       <span class="ring ring-two"></span>
@@ -34,6 +41,7 @@
           <button type="button" class="nav-link active" data-view="dashboard">Home</button>
           <button type="button" class="nav-link" data-view="products">Product Menu</button>
           <button type="button" class="nav-link" data-view="grocery">Grocery List</button>
+          <button type="button" class="nav-link" data-view="receipt">Receipt</button>
           <button type="button" class="nav-link" data-view="meals">Meal Planner</button>
           <button type="button" class="nav-link" data-view="pantry">Pantry</button>
           <button type="button" class="nav-link" data-view="budget">Budget</button>
@@ -42,30 +50,15 @@
           <button type="button" class="nav-link" data-view="notifications">Notifications</button>
           <button type="button" class="nav-link" data-view="profile">Profile</button>
           <button type="button" class="nav-link" data-view="settings">Settings</button>
-          <a class="nav-link nav-anchor" href="admin.html">Admin</a>
         </nav>
-
-        <button type="button" class="login-pill" id="accountButton" data-profile-open>♙ Login</button>
+        <div class="topbar-actions">
+          <button type="button" class="ghost-button guide-button" id="featureGuideButton">Feature Highlights</button>
+          <a class="ghost-button admin-page-link hidden" id="adminDashboardLink" href="admin.html">Admin Dashboard</a>
+          <button type="button" class="login-pill" id="accountButton" data-profile-open>Profile</button>
+        </div>
       </aside>
 
       <main class="main-content">
-        <section class="auth-panel hidden" id="authPanel">
-          <div class="auth-copy">
-            <p class="eyebrow">Secure account</p>
-            <h2>Login or create your grocery profile</h2>
-            <p>Save preferences, allergy notes, pantry history, and budget targets locally for this demo.</p>
-          </div>
-          <form class="auth-form" id="authForm">
-            <input id="userName" type="text" placeholder="Full name" required />
-            <input id="userEmail" type="email" placeholder="Email address" required />
-            <input id="userPassword" type="password" placeholder="Password" required />
-            <select id="userRole" required>
-              <option value="User">Register as User</option>
-              <option value="Admin">Register as Admin</option>
-            </select>
-            <button class="primary-button" type="submit">Save Profile</button>
-          </form>
-        </section>
 
         <section class="view" id="profile">
           <div class="section-heading">
@@ -152,6 +145,7 @@
               <div class="title-flourish">⌁</div>
               <p>Your smart grocery companion that understands your preferences, suggests the best, and makes shopping easier every day.</p>
               <button type="button" class="cta-button" data-view-trigger="products">Get Started <span>→</span></button>
+              <button type="button" class="ghost-button guide-button" id="heroFeatureButton">See Features</button>
             </div>
 
             <div class="hero-visual" aria-label="Grocery AI hero illustration">
@@ -197,7 +191,6 @@
             <button type="button" data-view-trigger="meals">🥗<span>Meal Planning<br />Made Easy</span></button>
             <button type="button" data-view-trigger="budget">💳<span>Budget<br />Tracker</span></button>
             <button type="button" data-view-trigger="notifications">🔔<span>Expiry Alerts &<br />Reminders</span></button>
-            <button type="button" data-admin-open>📊<span>Insights &<br />Analytics</span></button>
           </div>
 
           <div class="hero-stats">
@@ -274,6 +267,55 @@
               </thead>
               <tbody id="groceryTable"></tbody>
             </table>
+          </div>
+        </section>
+
+        <section class="view" id="receipt">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Purchase receipt</p>
+              <h2>Grocery Receipt</h2>
+            </div>
+            <div class="profile-actions">
+              <button type="button" class="primary-button" id="generateReceiptButton">Generate Receipt</button>
+              <button type="button" class="ghost-button" id="clearPurchasedButton">Clear Purchased</button>
+            </div>
+          </div>
+          
+          <div class="receipt-container" id="receiptContainer">
+            <div class="receipt-header">
+              <div class="receipt-brand">
+                <div class="brand-mark">🛒</div>
+                <div>
+                  <strong>GroceryAI</strong>
+                  <span>Receipt</span>
+                </div>
+              </div>
+              <div class="receipt-info">
+                <p><strong>Date:</strong> <span id="receiptDate">-</span></p>
+                <p><strong>Customer:</strong> <span id="receiptCustomer">-</span></p>
+              </div>
+            </div>
+            
+            <div class="receipt-items">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="receiptItemsTable"></tbody>
+              </table>
+            </div>
+            
+            <div class="receipt-summary">
+              <div class="receipt-total">
+                <strong>Total: <span id="receiptTotal">₱0.00</span></strong>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -357,6 +399,29 @@
               <button type="button" class="primary-button" data-view-trigger="grocery">View Cart</button>
             </div>
           </div>
+          <form class="input-row admin-only hidden" id="addProductForm">
+            <input id="productName" type="text" placeholder="Product name" required />
+            <select id="productCategory" required>
+              <option value="">Select category</option>
+              <option value="Produce">Produce</option>
+              <option value="Fruit">Fruit</option>
+              <option value="Dairy">Dairy</option>
+              <option value="Protein">Protein</option>
+              <option value="Seafood">Seafood</option>
+              <option value="Grains">Grains</option>
+              <option value="Bakery">Bakery</option>
+              <option value="Pantry">Pantry</option>
+              <option value="Breakfast">Breakfast</option>
+              <option value="Beverage">Beverage</option>
+              <option value="Frozen">Frozen</option>
+              <option value="Snacks">Snacks</option>
+              <option value="Household">Household</option>
+            </select>
+            <input id="productPrice" type="number" min="0" step="0.01" placeholder="Price (₱)" required />
+            <input id="productIcon" type="text" placeholder="Icon (emoji)" required />
+            <input id="productNutrition" type="text" placeholder="Nutrition info" required />
+            <button class="primary-button" type="submit">Add Product</button>
+          </form>
           <div class="product-grid" id="productGrid"></div>
         </section>
 
@@ -436,42 +501,70 @@
           </form>
         </section>
 
-        <section class="view" id="admin">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Operations</p>
-              <h2>Admin Dashboard</h2>
-            </div>
-            <a class="primary-button admin-page-link" href="admin.html">Open Admin Page</a>
-          </div>
-          <div class="stats-grid">
-            <article class="stat-card">
-              <span>Users</span>
-              <strong id="adminUsers">1</strong>
-              <small>Registered demo profiles</small>
-            </article>
-            <article class="stat-card">
-              <span>Products</span>
-              <strong id="adminProducts">0</strong>
-              <small>Catalog entries</small>
-            </article>
-            <article class="stat-card">
-              <span>Alerts</span>
-              <strong id="adminAlerts">0</strong>
-              <small>Active notifications</small>
-            </article>
-            <article class="stat-card">
-              <span>Health</span>
-              <strong>99%</strong>
-              <small>System uptime target</small>
-            </article>
-          </div>
-          <article class="panel">
-            <h2>Recent Activity</h2>
-            <div id="activityFeed" class="compact-list"></div>
-          </article>
-        </section>
       </main>
+    </div>
+
+    <div class="feature-guide-modal hidden" id="featureGuideModal" aria-hidden="true">
+      <div class="feature-guide-panel" role="dialog" aria-modal="true" aria-labelledby="featureGuideTitle">
+        <div class="feature-guide-header">
+          <div>
+            <p class="eyebrow">Welcome</p>
+            <h2 id="featureGuideTitle">Feature Highlights</h2>
+            <p>Find every menu and what it does in one place so the app feels easier to use.</p>
+          </div>
+          <button type="button" class="icon-button" id="closeFeatureGuide" aria-label="Close feature highlights">✕</button>
+        </div>
+        <div class="feature-guide-grid">
+          <article class="feature-card">
+            <strong>Home</strong>
+            <p>See your dashboard, quick stats, recommendations, and weekly meal overview.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Product Menu</strong>
+            <p>Browse groceries, search for items, and add products straight to your cart.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Grocery List</strong>
+            <p>Create and manage your shopping list, quantities, and item status.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Receipt</strong>
+            <p>Generate a receipt for completed purchases and review your totals.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Meal Planner</strong>
+            <p>Plan your meals for the week with ingredients and cooking ideas.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Pantry</strong>
+            <p>Track pantry stock and expiry dates so food stays fresh longer.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Budget</strong>
+            <p>Monitor spending and stay within your weekly grocery budget.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Prices</strong>
+            <p>Compare store prices and choose the best value for your groceries.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Recommendations</strong>
+            <p>Receive personalized grocery suggestions based on your preferences.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Notifications</strong>
+            <p>View alerts for budget status and pantry items that are expiring soon.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Settings</strong>
+            <p>Update diet preferences, household size, favorite store, and allergy notes.</p>
+          </article>
+          <article class="feature-card">
+            <strong>Profile</strong>
+            <p>See your account details and quickly access saved preferences.</p>
+          </article>
+        </div>
+      </div>
     </div>
 
     <script src="app.js"></script>

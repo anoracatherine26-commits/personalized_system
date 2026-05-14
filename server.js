@@ -24,7 +24,7 @@ app.use(express.static(publicDir));
 
 // Home route
 app.get("/", (req, res) => {
-  res.sendFile(path.join(publicDir, "index.html"));
+  res.sendFile(path.join(publicDir, "login.html"));
 });
 
 // Example API route (you can delete or modify this)
