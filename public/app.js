@@ -258,6 +258,21 @@ function switchView(viewId) {
 
   document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
   document.querySelectorAll(".nav-link").forEach((button) => button.classList.toggle("active", button.dataset.view === viewId));
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("mainSidebar");
+  if (sidebar) {
+    sidebar.classList.toggle("open");
+  }
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById("mainSidebar");
+  if (sidebar) {
+    sidebar.classList.remove("open");
+  }
 }
 
 function openFeatureGuide() {
@@ -493,6 +508,29 @@ document.addEventListener("click", (event) => {
 
   switchView(view);
 });
+
+const sidebarToggle = document.getElementById("sidebarToggle");
+if (sidebarToggle) {
+  sidebarToggle.addEventListener("click", toggleSidebar);
+}
+
+const navLinks = document.querySelectorAll(".nav-link[data-view]");
+navLinks.forEach((link) => {
+  link.addEventListener("click", (event) => {
+    const view = link.dataset.view;
+    switchView(view);
+  });
+});
+
+const mainContent = document.querySelector(".main-content");
+if (mainContent) {
+  mainContent.addEventListener("click", (event) => {
+    const sidebar = document.getElementById("mainSidebar");
+    if (sidebar && sidebar.classList.contains("open") && window.innerWidth <= 1180) {
+      closeSidebar();
+    }
+  });
+}
 
 const notifyButton = document.getElementById("notifyButton");
 if (notifyButton) {
