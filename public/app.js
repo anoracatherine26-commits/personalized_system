@@ -187,8 +187,12 @@ function loadState() {
 }
 
 function normalizeState(nextState) {
-  nextState.accounts = nextState.accounts || [];
-  nextState.products = nextState.products || defaultProducts;
+  nextState.accounts = Array.isArray(nextState.accounts) ? nextState.accounts : [];
+  nextState.products = Array.isArray(nextState.products) && nextState.products.length > 0 ? nextState.products : defaultProducts;
+  nextState.grocery = Array.isArray(nextState.grocery) && nextState.grocery.length > 0 ? nextState.grocery : defaultState.grocery;
+  nextState.meals = Array.isArray(nextState.meals) && nextState.meals.length > 0 ? nextState.meals : defaultState.meals;
+  nextState.pantry = Array.isArray(nextState.pantry) && nextState.pantry.length > 0 ? nextState.pantry : defaultState.pantry;
+
   if (nextState.user && !nextState.user.role) {
     nextState.user.role = "User";
   }
