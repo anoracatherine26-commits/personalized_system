@@ -143,6 +143,19 @@ const priceComparison = defaultProducts.slice(0, 14).map((product, index) => ({
   GreenCart: Number((product.price * (0.96 + ((index % 5) * 0.02))).toFixed(2))
 }));
 
+function mergeDefaultProducts(products) {
+  const byName = new Map();
+  defaultProducts.forEach((product) => byName.set(product.name.toLowerCase(), product));
+  if (Array.isArray(products)) {
+    products.forEach((product) => {
+      if (product?.name) {
+        byName.set(product.name.toLowerCase(), product);
+      }
+    });
+  }
+  return Array.from(byName.values());
+}
+
 const defaultState = {
   user: null,
   accounts: [],
@@ -182,8 +195,8 @@ function loadState() {
   try {
     const parsed = JSON.parse(saved);
     const merged = normalizeState({ ...structuredClone(defaultState), ...parsed });
-    if (!Array.isArray(merged.products) || merged.products.length === 0) {
-      merged.products = defaultProducts;
+    if (!Array.isArray(parsed.products) || merged.products.length !== parsed.products.length) {
+      localStorage.setItem(storageKey, JSON.stringify(merged));
     }
     return merged;
   } catch {
@@ -193,7 +206,7 @@ function loadState() {
 
 function normalizeState(nextState) {
   nextState.accounts = Array.isArray(nextState.accounts) ? nextState.accounts : [];
-  nextState.products = Array.isArray(nextState.products) && nextState.products.length > 0 ? nextState.products : defaultProducts;
+  nextState.products = mergeDefaultProducts(nextState.products);
   nextState.grocery = Array.isArray(nextState.grocery) && nextState.grocery.length > 0 ? nextState.grocery : defaultState.grocery;
   nextState.meals = Array.isArray(nextState.meals) && nextState.meals.length > 0 ? nextState.meals : defaultState.meals;
   nextState.pantry = Array.isArray(nextState.pantry) && nextState.pantry.length > 0 ? nextState.pantry : defaultState.pantry;
