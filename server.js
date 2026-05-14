@@ -24,7 +24,15 @@ app.use(express.static(publicDir));
 
 // Home route
 app.get("/", (req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
+});
+
+app.get("/login", (req, res) => {
   res.sendFile(path.join(publicDir, "login.html"));
+});
+
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(publicDir, "admin.html"));
 });
 
 // Example API route (you can delete or modify this)
@@ -37,7 +45,7 @@ app.get("/api", (req, res) => {
 // ========================
 // FALLBACK ROUTE (IMPORTANT FOR FRONTEND ROUTING)
 // ========================
-app.get("/*splat", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));
 });
 

@@ -28,8 +28,9 @@
     </div>
 
     <div class="app-shell">
+      <button type="button" class="sidebar-open-button" id="sidebarOpenButton" aria-label="Open sidebar navigation">☰ Menu</button>
       <aside class="sidebar" id="mainSidebar" aria-label="Main navigation">
-        <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar navigation">☰</button>
+        <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Close sidebar navigation">×</button>
         <div class="brand">
           <div class="brand-mark">🛒</div>
           <div>
@@ -397,6 +398,7 @@
                 <span id="cartTotal">₱0</span>
               </div>
               <input id="productSearch" type="search" placeholder="Search products" />
+              <button type="button" class="ghost-button" id="resetProductCatalog">Reset Catalog</button>
               <button type="button" class="primary-button" data-view-trigger="grocery">View Cart</button>
             </div>
           </div>

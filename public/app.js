@@ -156,6 +156,13 @@ function mergeDefaultProducts(products) {
   return Array.from(byName.values());
 }
 
+function ensureProducts(products) {
+  if (!Array.isArray(products) || products.length === 0) {
+    return mergeDefaultProducts([]);
+  }
+  return mergeDefaultProducts(products);
+}
+
 const defaultState = {
   user: null,
   accounts: [],
@@ -206,7 +213,7 @@ function loadState() {
 
 function normalizeState(nextState) {
   nextState.accounts = Array.isArray(nextState.accounts) ? nextState.accounts : [];
-  nextState.products = mergeDefaultProducts(nextState.products);
+  nextState.products = ensureProducts(nextState.products);
   nextState.grocery = Array.isArray(nextState.grocery) && nextState.grocery.length > 0 ? nextState.grocery : defaultState.grocery;
   nextState.meals = Array.isArray(nextState.meals) && nextState.meals.length > 0 ? nextState.meals : defaultState.meals;
   nextState.pantry = Array.isArray(nextState.pantry) && nextState.pantry.length > 0 ? nextState.pantry : defaultState.pantry;
@@ -361,7 +368,8 @@ function switchView(viewId) {
 function toggleSidebar() {
   const sidebar = document.getElementById("mainSidebar");
   if (sidebar) {
-    sidebar.classList.toggle("open");
+    const isOpen = sidebar.classList.toggle("open");
+    document.body.classList.toggle("sidebar-is-open", isOpen);
   }
 }
 
@@ -369,6 +377,15 @@ function closeSidebar() {
   const sidebar = document.getElementById("mainSidebar");
   if (sidebar) {
     sidebar.classList.remove("open");
+    document.body.classList.remove("sidebar-is-open");
+  }
+}
+
+function openSidebar() {
+  const sidebar = document.getElementById("mainSidebar");
+  if (sidebar) {
+    sidebar.classList.add("open");
+    document.body.classList.add("sidebar-is-open");
   }
 }
 
@@ -475,15 +492,13 @@ function renderBudget() {
 
 function renderProducts() {
   const search = document.getElementById("productSearch").value.toLowerCase();
-  if (!Array.isArray(state.products) || state.products.length === 0) {
-    state.products = defaultProducts;
-  }
+  state.products = ensureProducts(state.products);
   const filtered = state.products.filter((item) => `${item.name} ${item.category}`.toLowerCase().includes(search));
   document.getElementById("cartCount").textContent = `${getCartItemCount()} item${getCartItemCount() === 1 ? "" : "s"}`;
   document.getElementById("cartTotal").textContent = formatMoney(getGroceryTotal());
   const grid = document.getElementById("productGrid");
   if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state">No products found. Please try a different search or reload the page.</div>`;
+    grid.innerHTML = `<div class="empty-state">No products found. Please try a different search or reset the catalog.</div>`;
     return;
   }
   grid.innerHTML = filtered.map((item) => `
@@ -623,7 +638,12 @@ window.addEventListener("load", () => {
 
 const sidebarToggle = document.getElementById("sidebarToggle");
 if (sidebarToggle) {
-  sidebarToggle.addEventListener("click", toggleSidebar);
+  sidebarToggle.addEventListener("click", closeSidebar);
+}
+
+const sidebarOpenButton = document.getElementById("sidebarOpenButton");
+if (sidebarOpenButton) {
+  sidebarOpenButton.addEventListener("click", openSidebar);
 }
 
 const navLinks = document.querySelectorAll(".nav-link[data-view]");
@@ -631,6 +651,7 @@ navLinks.forEach((link) => {
   link.addEventListener("click", (event) => {
     const view = link.dataset.view;
     switchView(view);
+    closeSidebar();
   });
 });
 
@@ -747,6 +768,10 @@ document.getElementById("budgetLimit").addEventListener("change", (event) => {
 });
 
 document.getElementById("productSearch").addEventListener("input", renderProducts);
+document.getElementById("resetProductCatalog")?.addEventListener("click", () => {
+  state.products = mergeDefaultProducts([]);
+  saveState("Restored default product catalog");
+});
 
 document.getElementById("productGrid").addEventListener("click", (event) => {
   const productName = event.target.dataset.addProduct;
