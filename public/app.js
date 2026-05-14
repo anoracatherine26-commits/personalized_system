@@ -180,7 +180,12 @@ function loadState() {
   if (!saved) return structuredClone(defaultState);
 
   try {
-    return normalizeState({ ...structuredClone(defaultState), ...JSON.parse(saved) });
+    const parsed = JSON.parse(saved);
+    const merged = normalizeState({ ...structuredClone(defaultState), ...parsed });
+    if (!Array.isArray(merged.products) || merged.products.length === 0) {
+      merged.products = defaultProducts;
+    }
+    return merged;
   } catch {
     return structuredClone(defaultState);
   }
@@ -457,10 +462,18 @@ function renderBudget() {
 
 function renderProducts() {
   const search = document.getElementById("productSearch").value.toLowerCase();
+  if (!Array.isArray(state.products) || state.products.length === 0) {
+    state.products = defaultProducts;
+  }
   const filtered = state.products.filter((item) => `${item.name} ${item.category}`.toLowerCase().includes(search));
   document.getElementById("cartCount").textContent = `${getCartItemCount()} item${getCartItemCount() === 1 ? "" : "s"}`;
   document.getElementById("cartTotal").textContent = formatMoney(getGroceryTotal());
-  document.getElementById("productGrid").innerHTML = filtered.map((item) => `
+  const grid = document.getElementById("productGrid");
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state">No products found. Please try a different search or reload the page.</div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map((item) => `
     <article class="product-card">
       <div class="product-icon">${item.icon}</div>
       <div>
