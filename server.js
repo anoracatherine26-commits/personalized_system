@@ -45,7 +45,7 @@ app.get("/api", (req, res) => {
 // ========================
 // FALLBACK ROUTE (IMPORTANT FOR FRONTEND ROUTING)
 // ========================
-app.get("*", (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));
 });
 
