@@ -249,6 +249,10 @@
               <p class="eyebrow">List manager</p>
               <h2>Grocery List Manager</h2>
             </div>
+            <div class="profile-actions">
+              <button type="button" class="ghost-button" id="markAllBoughtButton">Mark All Bought</button>
+              <button type="button" class="danger-button" id="clearCartButton">Clear Cart</button>
+            </div>
           </div>
           <form class="input-row" id="groceryForm">
             <input id="groceryName" type="text" placeholder="Item name" required />
@@ -572,6 +576,7 @@
               <p class="eyebrow">Compare</p>
               <h2>Price Comparison</h2>
             </div>
+            <button type="button" class="ghost-button" id="refreshPricesButton">Refresh Prices</button>
           </div>
           <div class="table-wrap">
             <table>
@@ -595,6 +600,7 @@
               <p class="eyebrow">Personalized picks</p>
               <h2>Recommendations</h2>
             </div>
+            <button type="button" class="ghost-button" id="refreshRecommendationsPage">Refresh Picks</button>
           </div>
           <div class="card-grid" id="fullRecommendations"></div>
         </section>
@@ -605,6 +611,7 @@
               <p class="eyebrow">Alerts</p>
               <h2>Notifications</h2>
             </div>
+            <button type="button" class="ghost-button" id="resolveNotificationsButton">Mark Reviewed</button>
           </div>
           <div class="notification-list" id="notificationList"></div>
         </section>
@@ -640,6 +647,7 @@
             </label>
             <button class="primary-button" type="submit">Save Settings</button>
           </form>
+          <p class="settings-status" id="settingsStatus">Settings are used for Home, Recommendations, Budget, and Product Menu results.</p>
         </section>
 
       </main>
@@ -708,6 +716,6 @@
       </div>
     </div>
 
-    <script src="app.js?v=20260519-products-v3"></script>
+    <script src="app.js?v=20260519-features-v5"></script>
   </body>
 </html>

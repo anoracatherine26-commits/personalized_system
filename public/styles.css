@@ -1745,6 +1745,34 @@ tr:last-child td {
   align-self: end;
 }
 
+.settings-status {
+  max-width: 900px;
+  margin-top: 16px;
+  border: 1px solid rgba(132, 65, 15, 0.14);
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: var(--brown);
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 800;
+}
+
+.qty-control {
+  display: inline-grid;
+  grid-template-columns: 34px minmax(32px, auto) 34px;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty-control .ghost-button {
+  min-height: 34px;
+  padding: 0;
+}
+
+.qty-control span {
+  text-align: center;
+  font-weight: 900;
+}
+
 .notification {
   border-left: 5px solid #c98535;
 }

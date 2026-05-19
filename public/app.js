@@ -2,7 +2,7 @@ const storageKey = "personalized-grocery-ai-state";
 
 window.addEventListener("error", (event) => {
   const status = document.getElementById("productStatus");
-  if (status && !status.textContent.startsWith("Showing 203")) {
+  if (status && !status.textContent.startsWith("Showing ")) {
     status.textContent = `Product menu script error: ${event.message}`;
   }
 });
@@ -234,6 +234,71 @@ const priceComparison = defaultProducts.slice(0, 14).map((product, index) => ({
   GreenCart: Number((product.price * (0.96 + ((index % 5) * 0.02))).toFixed(2))
 }));
 
+function buildPriceComparison(seed = 0) {
+  return state.products.slice(seed % 20, (seed % 20) + 18).map((product, index) => ({
+    product: product.name,
+    FreshMart: Number((product.price * (1 + (((index + seed) % 4) * 0.035))).toFixed(2)),
+    BudgetBasket: Number((product.price * (0.9 + (((index + seed) % 3) * 0.025))).toFixed(2)),
+    GreenCart: Number((product.price * (0.95 + (((index + seed) % 5) * 0.02))).toFixed(2))
+  }));
+}
+
+const moreProducts = [
+  { name: "Papaya", category: "Fruit", icon: "🍈", price: 112.0, nutrition: "Tropical fiber-rich fruit" },
+  { name: "Calamansi", category: "Fruit", icon: "🍋", price: 56.0, nutrition: "Citrus seasoning and juice" },
+  { name: "Banana Lakatan", category: "Fruit", icon: "🍌", price: 95.2, nutrition: "Sweet local banana" },
+  { name: "Sayote", category: "Produce", icon: "🥬", price: 61.6, nutrition: "Budget vegetable for soups" },
+  { name: "Eggplant", category: "Produce", icon: "🍆", price: 78.4, nutrition: "Grill and stew vegetable" },
+  { name: "Okra", category: "Produce", icon: "🥒", price: 67.2, nutrition: "Fiber-rich vegetable" },
+  { name: "Bok Choy", category: "Produce", icon: "🥬", price: 89.6, nutrition: "Leafy stir-fry green" },
+  { name: "Malunggay Leaves", category: "Produce", icon: "🥬", price: 50.4, nutrition: "Nutrient-dense soup green" },
+  { name: "Ginger", category: "Produce", icon: "🫚", price: 72.8, nutrition: "Aromatic cooking root" },
+  { name: "Spring Onions", category: "Produce", icon: "🧅", price: 44.8, nutrition: "Fresh garnish and flavor" },
+  { name: "Pork Tenderloin", category: "Protein", icon: "🥩", price: 448.0, nutrition: "Lean pork protein" },
+  { name: "Beef Cubes", category: "Protein", icon: "🥩", price: 504.0, nutrition: "Stew and soup protein" },
+  { name: "Chicken Wings", category: "Protein", icon: "🍗", price: 313.6, nutrition: "Family meal protein" },
+  { name: "Longganisa", category: "Protein", icon: "🌭", price: 212.8, nutrition: "Breakfast sausage" },
+  { name: "Bangus", category: "Seafood", icon: "🐟", price: 280.0, nutrition: "Local fish protein" },
+  { name: "Tilapia", category: "Seafood", icon: "🐟", price: 196.0, nutrition: "Affordable fish protein" },
+  { name: "Squid", category: "Seafood", icon: "🦑", price: 336.0, nutrition: "Seafood for grilling" },
+  { name: "Crab Sticks", category: "Seafood", icon: "🦀", price: 156.8, nutrition: "Quick seafood add-on" },
+  { name: "Jasmine Rice", category: "Grains", icon: "🍚", price: 246.4, nutrition: "Fragrant rice staple" },
+  { name: "Glutinous Rice", category: "Grains", icon: "🍚", price: 224.0, nutrition: "Dessert rice staple" },
+  { name: "Wheat Loaf", category: "Bakery", icon: "🍞", price: 89.6, nutrition: "Sandwich bread" },
+  { name: "Cheese Bread", category: "Bakery", icon: "🧀", price: 100.8, nutrition: "Savory bakery snack" },
+  { name: "Canned Tuna", category: "Pantry", icon: "🥫", price: 112.0, nutrition: "Ready protein pantry item" },
+  { name: "Canned Tomatoes", category: "Pantry", icon: "🥫", price: 95.2, nutrition: "Sauce and stew base" },
+  { name: "Tomato Paste", category: "Pantry", icon: "🥫", price: 61.6, nutrition: "Concentrated tomato flavor" },
+  { name: "Patis", category: "Pantry", icon: "🍶", price: 78.4, nutrition: "Fish sauce seasoning" },
+  { name: "Bagoong", category: "Pantry", icon: "🥫", price: 84.0, nutrition: "Savory local condiment" },
+  { name: "Cream of Mushroom", category: "Pantry", icon: "🥫", price: 89.6, nutrition: "Soup and sauce base" },
+  { name: "Powdered Milk", category: "Breakfast", icon: "🥛", price: 336.0, nutrition: "Breakfast milk powder" },
+  { name: "Instant Coffee", category: "Beverage", icon: "☕", price: 168.0, nutrition: "Quick coffee drink" },
+  { name: "Cocoa Powder", category: "Beverage", icon: "🍫", price: 145.6, nutrition: "Chocolate drink mix" },
+  { name: "Electrolyte Drink", category: "Beverage", icon: "🥤", price: 117.6, nutrition: "Hydration drink" },
+  { name: "Frozen Tocino", category: "Frozen", icon: "🥩", price: 257.6, nutrition: "Sweet cured pork" },
+  { name: "Frozen Lumpia", category: "Frozen", icon: "🥟", price: 224.0, nutrition: "Quick party snack" },
+  { name: "Frozen Meatballs", category: "Frozen", icon: "🍖", price: 246.4, nutrition: "Easy pasta protein" },
+  { name: "Wafer Sticks", category: "Snacks", icon: "🍪", price: 78.4, nutrition: "Sweet snack" },
+  { name: "Rice Crackers", category: "Snacks", icon: "🍘", price: 95.2, nutrition: "Crunchy snack" },
+  { name: "Banana Chips", category: "Snacks", icon: "🍌", price: 112.0, nutrition: "Sweet crunchy snack" },
+  { name: "Dental Floss", category: "Hygiene", icon: "🦷", price: 95.2, nutrition: "Oral hygiene" },
+  { name: "Toothbrush Pack", category: "Hygiene", icon: "🪥", price: 156.8, nutrition: "Family dental care" },
+  { name: "Body Lotion", category: "Hygiene", icon: "🧴", price: 224.0, nutrition: "Skin moisturizer" },
+  { name: "Face Wash", category: "Hygiene", icon: "🧴", price: 184.8, nutrition: "Daily facial cleanser" },
+  { name: "Talcum Powder", category: "Hygiene", icon: "🧴", price: 89.6, nutrition: "Personal care powder" },
+  { name: "Sanitary Napkins", category: "Hygiene", icon: "🧴", price: 196.0, nutrition: "Personal hygiene" },
+  { name: "Pantyliners", category: "Hygiene", icon: "🧴", price: 112.0, nutrition: "Daily hygiene" },
+  { name: "Disinfecting Wipes", category: "Household", icon: "🧻", price: 145.6, nutrition: "Surface cleaning wipes" },
+  { name: "Laundry Bar Soap", category: "Household", icon: "🧼", price: 50.4, nutrition: "Handwash laundry soap" },
+  { name: "Drain Cleaner", category: "Household", icon: "🧴", price: 156.8, nutrition: "Sink maintenance" },
+  { name: "Food Containers", category: "Household", icon: "🥡", price: 224.0, nutrition: "Food storage set" },
+  { name: "Baby Bath Soap", category: "Baby Care", icon: "🧼", price: 134.4, nutrition: "Gentle baby wash" },
+  { name: "Baby Bottle Cleanser", category: "Baby Care", icon: "🍼", price: 190.4, nutrition: "Bottle cleaning" }
+];
+
+defaultProducts.push(...moreProducts);
+
 function sanitizeProduct(product) {
   if (!product || typeof product.name !== "string" || !product.name.trim()) {
     return null;
@@ -295,6 +360,9 @@ const defaultState = {
   },
   currency: "PHP",
   budgetLimit: 6500,
+  recommendationSeed: 0,
+  priceSeed: 0,
+  notificationsReviewedAt: null,
   grocery: [
     { id: createId(), name: "Brown Rice", qty: "2", price: 470.4, category: "Grains", done: false },
     { id: createId(), name: "Spinach", qty: "3", price: 571.2, category: "Produce", done: false },
@@ -355,6 +423,9 @@ function normalizeState(nextState) {
     ? { ...defaultState.settings, ...nextState.settings }
     : { ...defaultState.settings };
   nextState.budgetLimit = Number.isFinite(Number(nextState.budgetLimit)) ? Number(nextState.budgetLimit) : defaultState.budgetLimit;
+  nextState.recommendationSeed = Number.isFinite(Number(nextState.recommendationSeed)) ? Number(nextState.recommendationSeed) : 0;
+  nextState.priceSeed = Number.isFinite(Number(nextState.priceSeed)) ? Number(nextState.priceSeed) : 0;
+  nextState.notificationsReviewedAt = nextState.notificationsReviewedAt || null;
   nextState.currency = nextState.currency || defaultState.currency;
 
   if (nextState.user && !nextState.user.role) {
@@ -473,6 +544,13 @@ function getNotifications() {
       type: "info",
       title: "Recommendation engine updated",
       body: `Diet preference: ${state.settings.diet}. Favorite store: ${state.settings.store}.`
+    },
+    {
+      type: state.notificationsReviewedAt ? "info" : "warning",
+      title: state.notificationsReviewedAt ? "Notifications reviewed" : "Action review pending",
+      body: state.notificationsReviewedAt
+        ? `Last reviewed ${new Date(state.notificationsReviewedAt).toLocaleString()}.`
+        : "Use Mark Reviewed after checking budget, pantry, and recommendations."
     }
   ];
   return notices;
@@ -481,17 +559,28 @@ function getNotifications() {
 function getRecommendations() {
   const pantryNames = new Set(state.pantry.map((item) => item.name.toLowerCase()));
   const groceryNames = new Set(state.grocery.map((item) => item.name.toLowerCase()));
-  const base = state.products
-    .filter((product) => !pantryNames.has(product.name.toLowerCase()) && !groceryNames.has(product.name.toLowerCase()))
-    .slice(0, 5);
+  const allergyTerms = String(state.settings.allergies || "")
+    .toLowerCase()
+    .split(",")
+    .map((term) => term.trim())
+    .filter(Boolean);
+  const budgetTarget = Math.max(80, state.budgetLimit / Math.max(1, Number(state.settings.household || 1)) / 8);
+  const offset = Number(state.recommendationSeed || 0);
 
-  if (state.settings.diet === "High protein") {
-    return base.sort((a) => (["Protein", "Seafood", "Dairy"].includes(a.category) ? -1 : 1));
-  }
-  if (state.settings.diet === "Vegetarian") {
-    return base.filter((item) => item.category !== "Seafood" && item.name !== "Chicken Breast");
-  }
-  return base;
+  return state.products
+    .filter((product) => !pantryNames.has(product.name.toLowerCase()) && !groceryNames.has(product.name.toLowerCase()))
+    .filter((product) => !allergyTerms.some((term) => `${product.name} ${product.category} ${product.nutrition}`.toLowerCase().includes(term)))
+    .map((product, index) => {
+      let score = 100 - Math.abs(Number(product.price || 0) - budgetTarget) / 20;
+      if (state.settings.diet === "High protein" && ["Protein", "Seafood", "Dairy"].includes(product.category)) score += 60;
+      if (state.settings.diet === "Vegetarian" && !["Protein", "Seafood"].includes(product.category)) score += 45;
+      if (state.settings.diet === "Low sugar" && !["Snacks", "Beverage", "Breakfast"].includes(product.category)) score += 35;
+      if (["Produce", "Fruit", "Grains", "Pantry", "Hygiene", "Household"].includes(product.category)) score += 12;
+      score += ((index + offset) % 9) * 2;
+      return { ...product, score };
+    })
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+    .slice(0, 12);
 }
 
 function switchView(viewId) {
@@ -559,8 +648,8 @@ function renderDashboard() {
 
   document.getElementById("recommendationList").innerHTML = getRecommendations().slice(0, 3).map((item) => `
     <div class="recommendation-mini">
-      <strong>${item.icon} ${item.name}</strong>
-      <span>${item.nutrition} • ${formatMoney(item.price)}</span>
+      <strong>${escapeHtml(item.icon)} ${escapeHtml(item.name)}</strong>
+      <span>${escapeHtml(item.nutrition)} • ${formatMoney(item.price)}</span>
     </div>
   `).join("");
 
@@ -573,39 +662,47 @@ function renderDashboard() {
 }
 
 function renderGrocery() {
-  document.getElementById("groceryTable").innerHTML = state.grocery.map((item) => `
+  document.getElementById("groceryTable").innerHTML = state.grocery.length ? state.grocery.map((item) => `
     <tr>
-      <td>${item.name}</td>
-      <td>${item.qty}</td>
+      <td>${escapeHtml(item.name)}</td>
+      <td>
+        <div class="qty-control">
+          <button type="button" class="ghost-button" data-decrement-item="${item.id}">-</button>
+          <span>${escapeHtml(item.qty)}</span>
+          <button type="button" class="ghost-button" data-increment-item="${item.id}">+</button>
+        </div>
+      </td>
       <td>${formatMoney(Number(item.price))}</td>
       <td><button type="button" class="pill ${item.done ? "" : "warning"}" data-toggle-item="${item.id}">${item.done ? "Bought" : "Needed"}</button></td>
       <td><button type="button" class="danger-button" data-delete-item="${item.id}">Remove</button></td>
     </tr>
-  `).join("");
+  `).join("") : `<tr><td colspan="5">Your cart is empty. Add products from Product Menu or Recommendations.</td></tr>`;
 }
 
 function renderMeals() {
-  document.getElementById("mealGrid").innerHTML = state.meals.map((meal) => `
+  document.getElementById("mealGrid").innerHTML = state.meals.length ? state.meals.map((meal) => `
     <article class="meal-card">
-      <span class="day">${meal.day}</span>
-      <strong>${meal.name}</strong>
-      <span>${meal.ingredients}</span>
+      <span class="day">${escapeHtml(meal.day)}</span>
+      <strong>${escapeHtml(meal.name)}</strong>
+      <span>${escapeHtml(meal.ingredients)}</span>
+      <button type="button" class="danger-button" data-delete-meal="${meal.id}">Remove</button>
     </article>
-  `).join("");
+  `).join("") : `<div class="empty-state">No meals scheduled yet.</div>`;
 }
 
 function renderPantry() {
-  document.getElementById("pantryGrid").innerHTML = state.pantry.map((item) => {
+  document.getElementById("pantryGrid").innerHTML = state.pantry.length ? state.pantry.map((item) => {
     const days = Math.ceil((new Date(item.expiry) - new Date()) / 86400000);
     const status = days <= 7 ? "danger" : days <= 14 ? "warning" : "";
     return `
       <article class="pantry-card">
-        <strong>${item.name}</strong>
-        <span>Stock: ${item.qty}</span>
+        <strong>${escapeHtml(item.name)}</strong>
+        <span>Stock: ${escapeHtml(item.qty)}</span>
         <p class="pill ${status}">Expires in ${days} days</p>
+        <button type="button" class="danger-button" data-delete-pantry="${item.id}">Remove</button>
       </article>
     `;
-  }).join("");
+  }).join("") : `<div class="empty-state">No pantry items tracked yet.</div>`;
 }
 
 function renderBudget() {
@@ -708,28 +805,36 @@ function renderProducts() {
 }
 
 function renderPrices() {
-  document.getElementById("priceTable").innerHTML = priceComparison.map((row) => {
+  const rows = buildPriceComparison(state.priceSeed);
+  document.getElementById("priceTable").innerHTML = rows.map((row) => {
     const best = getBestPrice(row);
     return `
       <tr>
-        <td>${row.product}</td>
+        <td>${escapeHtml(row.product)}</td>
         <td>${formatMoney(row.FreshMart)}</td>
         <td>${formatMoney(row.BudgetBasket)}</td>
         <td>${formatMoney(row.GreenCart)}</td>
-        <td><span class="pill">${best}</span></td>
+        <td>
+          <span class="pill">${best}</span>
+          <button type="button" class="ghost-button" data-add-price-product="${escapeHtml(row.product)}">Add</button>
+        </td>
       </tr>
     `;
   }).join("");
 }
 
 function renderRecommendations() {
-  document.getElementById("fullRecommendations").innerHTML = getRecommendations().map((item) => `
+  const recommendations = getRecommendations();
+  document.getElementById("fullRecommendations").innerHTML = recommendations.length ? recommendations.map((item) => `
     <article class="recommend-card">
-      <strong>${item.icon} ${item.name}</strong>
-      <span>${item.nutrition}</span>
-      <p class="pill">${item.category}</p>
+      <strong>${escapeHtml(item.icon)} ${escapeHtml(item.name)}</strong>
+      <span>${escapeHtml(item.nutrition)}</span>
+      <p class="pill">${escapeHtml(item.category)} • ${formatMoney(item.price)}</p>
+      <button type="button" class="ghost-button" data-add-product="${escapeHtml(item.name)}">
+        ${getProductQtyInCart(item.name) ? `In Cart (${getProductQtyInCart(item.name)})` : "Add to Cart"}
+      </button>
     </article>
-  `).join("");
+  `).join("") : `<div class="empty-state">No recommendations match your settings. Clear allergy notes or reset the catalog.</div>`;
 }
 
 function renderNotifications() {
@@ -747,6 +852,10 @@ function renderSettings() {
   document.getElementById("householdSetting").value = state.settings.household;
   document.getElementById("storeSetting").value = state.settings.store;
   document.getElementById("allergySetting").value = state.settings.allergies;
+  const status = $("settingsStatus");
+  if (status) {
+    status.textContent = `${state.settings.diet} plan for ${state.settings.household} household member${Number(state.settings.household) === 1 ? "" : "s"} at ${state.settings.store}. Allergy notes: ${state.settings.allergies || "none"}.`;
+  }
 }
 
 function renderProfile() {
@@ -896,7 +1005,7 @@ if (featureGuideModal) {
 }
 
 on("editProfileButton", "click", () => {
-  window.location.href = "login.html";
+  switchView("settings");
 });
 
 on("logoutButton", "click", () => {
@@ -925,16 +1034,46 @@ on("groceryForm", "submit", (event) => {
 on("groceryTable", "click", (event) => {
   const toggleId = event.target.dataset.toggleItem;
   const deleteId = event.target.dataset.deleteItem;
+  const incrementId = event.target.dataset.incrementItem;
+  const decrementId = event.target.dataset.decrementItem;
   if (toggleId) {
     const item = state.grocery.find((entry) => entry.id === toggleId);
     if (!item) return;
     item.done = !item.done;
     saveState(`${item.name} marked ${item.done ? "bought" : "needed"}`);
   }
+  if (incrementId || decrementId) {
+    const id = incrementId || decrementId;
+    const item = state.grocery.find((entry) => entry.id === id);
+    const product = item && state.products.find((entry) => entry.name.toLowerCase() === item.name.toLowerCase());
+    if (!item) return;
+    const currentQty = getQtyNumber(item.qty);
+    const nextQty = incrementId ? currentQty + 1 : Math.max(1, currentQty - 1);
+    const unitPrice = product?.price || Number(item.price || 0) / currentQty || 0;
+    item.qty = String(nextQty);
+    item.price = Number((unitPrice * nextQty).toFixed(2));
+    saveState(`Updated ${item.name} quantity to ${nextQty}`);
+  }
   if (deleteId) {
     const item = state.grocery.find((entry) => entry.id === deleteId);
     state.grocery = state.grocery.filter((entry) => entry.id !== deleteId);
     saveState(`Removed ${item?.name || "item"} from grocery list`);
+  }
+});
+
+on("markAllBoughtButton", "click", () => {
+  state.grocery = state.grocery.map((item) => ({ ...item, done: true }));
+  saveState("Marked all grocery items as bought");
+});
+
+on("clearCartButton", "click", () => {
+  if (state.grocery.length === 0) {
+    alert("Your cart is already empty.");
+    return;
+  }
+  if (confirm("Clear all grocery items from your cart?")) {
+    state.grocery = [];
+    saveState("Cleared grocery cart");
   }
 });
 
@@ -951,6 +1090,14 @@ on("mealForm", "submit", (event) => {
   saveState(`Scheduled ${meal.name}`);
 });
 
+on("mealGrid", "click", (event) => {
+  const mealId = event.target.dataset.deleteMeal;
+  if (!mealId) return;
+  const meal = state.meals.find((entry) => entry.id === mealId);
+  state.meals = state.meals.filter((entry) => entry.id !== mealId);
+  saveState(`Removed meal ${meal?.name || ""}`.trim());
+});
+
 on("pantryForm", "submit", (event) => {
   event.preventDefault();
   const item = {
@@ -962,6 +1109,14 @@ on("pantryForm", "submit", (event) => {
   state.pantry.push(item);
   event.target.reset();
   saveState(`Tracked pantry item ${item.name}`);
+});
+
+on("pantryGrid", "click", (event) => {
+  const pantryId = event.target.dataset.deletePantry;
+  if (!pantryId) return;
+  const item = state.pantry.find((entry) => entry.id === pantryId);
+  state.pantry = state.pantry.filter((entry) => entry.id !== pantryId);
+  saveState(`Removed pantry item ${item?.name || ""}`.trim());
 });
 
 on("budgetLimit", "change", (event) => {
@@ -995,6 +1150,28 @@ on("productGrid", "click", (event) => {
   addProductToCart(product);
 });
 
+on("fullRecommendations", "click", (event) => {
+  const button = event.target.closest("[data-add-product]");
+  const productName = button?.dataset.addProduct;
+  if (!productName) return;
+  const product = state.products.find((item) => item.name === productName);
+  if (!product) return;
+  addProductToCart(product);
+});
+
+on("priceTable", "click", (event) => {
+  const productName = event.target.dataset.addPriceProduct;
+  if (!productName) return;
+  const product = state.products.find((item) => item.name === productName);
+  if (!product) return;
+  addProductToCart(product);
+});
+
+on("refreshPricesButton", "click", () => {
+  state.priceSeed += 3;
+  saveState("Price comparison refreshed");
+});
+
 on("settingsForm", "submit", (event) => {
   event.preventDefault();
   state.settings = {
@@ -1003,11 +1180,28 @@ on("settingsForm", "submit", (event) => {
     store: $("storeSetting").value,
     allergies: $("allergySetting").value
   };
+  state.recommendationSeed += 1;
+  selectedProductCategory = "All";
+  if ($("productSearch")) {
+    $("productSearch").value = "";
+  }
   saveState("Settings updated");
+  switchView("recommendations");
 });
 
 on("refreshRecs", "click", () => {
+  state.recommendationSeed += 1;
   saveState("Recommendations refreshed");
+});
+
+on("refreshRecommendationsPage", "click", () => {
+  state.recommendationSeed += 1;
+  saveState("Recommendation picks refreshed");
+});
+
+on("resolveNotificationsButton", "click", () => {
+  state.notificationsReviewedAt = new Date().toISOString();
+  saveState("Notifications marked reviewed");
 });
 
 on("addProductForm", "submit", (event) => {
