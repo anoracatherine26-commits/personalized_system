@@ -1,5 +1,26 @@
 const storageKey = "personalized-grocery-ai-state";
 
+window.addEventListener("error", (event) => {
+  const status = document.getElementById("productStatus");
+  if (status && !status.textContent.startsWith("Showing 203")) {
+    status.textContent = `Product menu script error: ${event.message}`;
+  }
+});
+
+function createId() {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === "function") {
+    return globalThis.crypto.randomUUID();
+  }
+  return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function cloneState(value) {
+  if (typeof structuredClone === "function") {
+    return structuredClone(value);
+  }
+  return JSON.parse(JSON.stringify(value));
+}
+
 const defaultProducts = [
   { name: "Organic Banana", category: "Produce", icon: "🍌", price: 67.2, nutrition: "Potassium rich snack" },
   { name: "Red Apples", category: "Produce", icon: "🍎", price: 212.8, nutrition: "Crisp fruit for snacks" },
@@ -275,19 +296,19 @@ const defaultState = {
   currency: "PHP",
   budgetLimit: 6500,
   grocery: [
-    { id: crypto.randomUUID(), name: "Brown Rice", qty: "2", price: 470.4, category: "Grains", done: false },
-    { id: crypto.randomUUID(), name: "Spinach", qty: "3", price: 571.2, category: "Produce", done: false },
-    { id: crypto.randomUUID(), name: "Greek Yogurt", qty: "4", price: 1142.4, category: "Dairy", done: true }
+    { id: createId(), name: "Brown Rice", qty: "2", price: 470.4, category: "Grains", done: false },
+    { id: createId(), name: "Spinach", qty: "3", price: 571.2, category: "Produce", done: false },
+    { id: createId(), name: "Greek Yogurt", qty: "4", price: 1142.4, category: "Dairy", done: true }
   ],
   meals: [
-    { id: crypto.randomUUID(), day: "Monday", name: "Chicken rice bowls", ingredients: "Chicken, brown rice, spinach" },
-    { id: crypto.randomUUID(), day: "Wednesday", name: "Salmon and broccoli", ingredients: "Salmon, broccoli, yogurt sauce" },
-    { id: crypto.randomUUID(), day: "Friday", name: "Vegetable egg toast", ingredients: "Eggs, bread, spinach" }
+    { id: createId(), day: "Monday", name: "Chicken rice bowls", ingredients: "Chicken, brown rice, spinach" },
+    { id: createId(), day: "Wednesday", name: "Salmon and broccoli", ingredients: "Salmon, broccoli, yogurt sauce" },
+    { id: createId(), day: "Friday", name: "Vegetable egg toast", ingredients: "Eggs, bread, spinach" }
   ],
   pantry: [
-    { id: crypto.randomUUID(), name: "Olive Oil", qty: 1, expiry: "2026-08-30" },
-    { id: crypto.randomUUID(), name: "Oats", qty: 2, expiry: "2026-07-16" },
-    { id: crypto.randomUUID(), name: "Canned Tomatoes", qty: 5, expiry: "2026-11-05" }
+    { id: createId(), name: "Olive Oil", qty: 1, expiry: "2026-08-30" },
+    { id: createId(), name: "Oats", qty: 2, expiry: "2026-07-16" },
+    { id: createId(), name: "Canned Tomatoes", qty: 5, expiry: "2026-11-05" }
   ],
   activity: ["System initialized", "Weekly meal plan created", "Budget limit set"]
 };
@@ -307,26 +328,19 @@ function on(id, eventName, handler) {
   return element;
 }
 
-window.addEventListener("error", (event) => {
-  const status = $("productStatus");
-  if (status && status.textContent === "Loading products...") {
-    status.textContent = `Product menu script error: ${event.message}`;
-  }
-});
-
 function loadState() {
   const saved = localStorage.getItem(storageKey);
-  if (!saved) return structuredClone(defaultState);
+  if (!saved) return cloneState(defaultState);
 
   try {
     const parsed = JSON.parse(saved);
-    const merged = normalizeState({ ...structuredClone(defaultState), ...parsed });
+    const merged = normalizeState({ ...cloneState(defaultState), ...parsed });
     if (!Array.isArray(parsed.products) || merged.products.length !== parsed.products.length) {
       localStorage.setItem(storageKey, JSON.stringify(merged));
     }
     return merged;
   } catch {
-    return structuredClone(defaultState);
+    return cloneState(defaultState);
   }
 }
 
@@ -421,7 +435,7 @@ function addProductToCart(product) {
   }
 
   state.grocery.push({
-    id: crypto.randomUUID(),
+    id: createId(),
     name: product.name,
     qty: "1",
     price: product.price,
@@ -897,7 +911,7 @@ on("groceryForm", "submit", (event) => {
   const name = $("groceryName").value.trim();
   const product = state.products.find((item) => item.name.toLowerCase() === name.toLowerCase());
   state.grocery.push({
-    id: crypto.randomUUID(),
+    id: createId(),
     name,
     qty: $("groceryQty").value,
     price: Number($("groceryPrice").value),
@@ -927,7 +941,7 @@ on("groceryTable", "click", (event) => {
 on("mealForm", "submit", (event) => {
   event.preventDefault();
   const meal = {
-    id: crypto.randomUUID(),
+    id: createId(),
     day: $("mealDay").value,
     name: $("mealName").value,
     ingredients: $("mealIngredients").value
@@ -940,7 +954,7 @@ on("mealForm", "submit", (event) => {
 on("pantryForm", "submit", (event) => {
   event.preventDefault();
   const item = {
-    id: crypto.randomUUID(),
+    id: createId(),
     name: $("pantryName").value,
     qty: Number($("pantryQty").value),
     expiry: $("pantryExpiry").value
