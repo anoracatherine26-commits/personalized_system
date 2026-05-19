@@ -213,13 +213,42 @@ const priceComparison = defaultProducts.slice(0, 14).map((product, index) => ({
   GreenCart: Number((product.price * (0.96 + ((index % 5) * 0.02))).toFixed(2))
 }));
 
+function sanitizeProduct(product) {
+  if (!product || typeof product.name !== "string" || !product.name.trim()) {
+    return null;
+  }
+
+  return {
+    name: product.name.trim(),
+    category: typeof product.category === "string" && product.category.trim() ? product.category.trim() : "General",
+    icon: typeof product.icon === "string" && product.icon.trim() ? product.icon.trim() : "🛒",
+    price: Number.isFinite(Number(product.price)) ? Number(product.price) : 0,
+    nutrition: typeof product.nutrition === "string" && product.nutrition.trim() ? product.nutrition.trim() : "Everyday essential"
+  };
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function mergeDefaultProducts(products) {
   const byName = new Map();
-  defaultProducts.forEach((product) => byName.set(product.name.toLowerCase(), product));
+  defaultProducts.forEach((product) => {
+    const cleanProduct = sanitizeProduct(product);
+    if (cleanProduct) {
+      byName.set(cleanProduct.name.toLowerCase(), cleanProduct);
+    }
+  });
   if (Array.isArray(products)) {
     products.forEach((product) => {
-      if (product?.name) {
-        byName.set(product.name.toLowerCase(), product);
+      const cleanProduct = sanitizeProduct(product);
+      if (cleanProduct) {
+        byName.set(cleanProduct.name.toLowerCase(), cleanProduct);
       }
     });
   }
@@ -264,6 +293,19 @@ const defaultState = {
 };
 
 let state = loadState();
+let selectedProductCategory = "All";
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+function on(id, eventName, handler) {
+  const element = $(id);
+  if (element) {
+    element.addEventListener(eventName, handler);
+  }
+  return element;
+}
 
 function loadState() {
   const saved = localStorage.getItem(storageKey);
@@ -560,27 +602,73 @@ function renderBudget() {
     : `You have ${formatMoney(state.budgetLimit - total)} left this week. Add pantry staples while staying within your plan.`;
 }
 
+function getProductCategories() {
+  const priority = [
+    "All",
+    "Produce",
+    "Fruit",
+    "Dairy",
+    "Protein",
+    "Seafood",
+    "Grains",
+    "Bakery",
+    "Pantry",
+    "Breakfast",
+    "Beverage",
+    "Frozen",
+    "Snacks",
+    "Hygiene",
+    "Household",
+    "Baby Care",
+    "Pet Care"
+  ];
+  const categories = new Set(state.products.map((product) => product.category || "General"));
+  return priority.concat([...categories].filter((category) => !priority.includes(category)));
+}
+
+function renderProductCategories() {
+  const filter = $("productCategoryFilter");
+  if (!filter) return;
+
+  filter.innerHTML = getProductCategories().map((category) => `
+    <button type="button" class="${selectedProductCategory === category ? "active" : ""}" data-product-category="${escapeHtml(category)}">
+      ${escapeHtml(category)}
+    </button>
+  `).join("");
+}
+
 function renderProducts() {
-  const search = document.getElementById("productSearch").value.toLowerCase();
   state.products = ensureProducts(state.products);
-  const filtered = state.products.filter((item) => `${item.name} ${item.category}`.toLowerCase().includes(search));
-  document.getElementById("cartCount").textContent = `${getCartItemCount()} item${getCartItemCount() === 1 ? "" : "s"}`;
-  document.getElementById("cartTotal").textContent = formatMoney(getGroceryTotal());
-  const grid = document.getElementById("productGrid");
+  if (!getProductCategories().includes(selectedProductCategory)) {
+    selectedProductCategory = "All";
+  }
+
+  renderProductCategories();
+
+  const search = ($("productSearch")?.value || "").trim().toLowerCase();
+  const filtered = state.products.filter((item) => {
+    const matchesCategory = selectedProductCategory === "All" || item.category === selectedProductCategory;
+    const matchesSearch = `${item.name} ${item.category} ${item.nutrition}`.toLowerCase().includes(search);
+    return matchesCategory && matchesSearch;
+  });
+  const cartItemCount = getCartItemCount();
+  $("cartCount").textContent = `${cartItemCount} item${cartItemCount === 1 ? "" : "s"}`;
+  $("cartTotal").textContent = formatMoney(getGroceryTotal());
+  const grid = $("productGrid");
   if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state">No products found. Please try a different search or reset the catalog.</div>`;
+    grid.innerHTML = `<div class="empty-state">No products found. Clear search, choose All, or reset the catalog.</div>`;
     return;
   }
   grid.innerHTML = filtered.map((item) => `
     <article class="product-card">
-      <div class="product-icon">${item.icon}</div>
+      <div class="product-icon">${escapeHtml(item.icon)}</div>
       <div>
-        <strong>${item.name}</strong>
-        <span>${item.category} • ${item.nutrition}</span>
+        <strong>${escapeHtml(item.name)}</strong>
+        <span>${escapeHtml(item.category)} • ${escapeHtml(item.nutrition)}</span>
       </div>
       <div class="product-meta">
         <span>${formatMoney(item.price)}</span>
-        <button type="button" class="ghost-button" data-add-product="${item.name}">${getProductQtyInCart(item.name) ? `In Cart (${getProductQtyInCart(item.name)})` : "Add to Cart"}</button>
+        <button type="button" class="ghost-button" data-add-product="${escapeHtml(item.name)}">${getProductQtyInCart(item.name) ? `In Cart (${getProductQtyInCart(item.name)})` : "Add to Cart"}</button>
       </div>
     </article>
   `).join("");
@@ -764,26 +852,26 @@ if (featureGuideModal) {
   });
 }
 
-document.getElementById("editProfileButton").addEventListener("click", () => {
+on("editProfileButton", "click", () => {
   window.location.href = "login.html";
 });
 
-document.getElementById("logoutButton").addEventListener("click", () => {
+on("logoutButton", "click", () => {
   const name = state.user?.name || "User";
   state.user = null;
   saveState(`${name} logged out`);
   window.location.href = "login.html";
 });
 
-document.getElementById("groceryForm").addEventListener("submit", (event) => {
+on("groceryForm", "submit", (event) => {
   event.preventDefault();
-  const name = document.getElementById("groceryName").value.trim();
+  const name = $("groceryName").value.trim();
   const product = state.products.find((item) => item.name.toLowerCase() === name.toLowerCase());
   state.grocery.push({
     id: crypto.randomUUID(),
     name,
-    qty: document.getElementById("groceryQty").value,
-    price: Number(document.getElementById("groceryPrice").value),
+    qty: $("groceryQty").value,
+    price: Number($("groceryPrice").value),
     category: product?.category || "General",
     done: false
   });
@@ -791,90 +879,102 @@ document.getElementById("groceryForm").addEventListener("submit", (event) => {
   saveState(`Added ${name} to grocery list`);
 });
 
-document.getElementById("groceryTable").addEventListener("click", (event) => {
+on("groceryTable", "click", (event) => {
   const toggleId = event.target.dataset.toggleItem;
   const deleteId = event.target.dataset.deleteItem;
   if (toggleId) {
     const item = state.grocery.find((entry) => entry.id === toggleId);
+    if (!item) return;
     item.done = !item.done;
     saveState(`${item.name} marked ${item.done ? "bought" : "needed"}`);
   }
   if (deleteId) {
     const item = state.grocery.find((entry) => entry.id === deleteId);
     state.grocery = state.grocery.filter((entry) => entry.id !== deleteId);
-    saveState(`Removed ${item.name} from grocery list`);
+    saveState(`Removed ${item?.name || "item"} from grocery list`);
   }
 });
 
-document.getElementById("mealForm").addEventListener("submit", (event) => {
+on("mealForm", "submit", (event) => {
   event.preventDefault();
   const meal = {
     id: crypto.randomUUID(),
-    day: document.getElementById("mealDay").value,
-    name: document.getElementById("mealName").value,
-    ingredients: document.getElementById("mealIngredients").value
+    day: $("mealDay").value,
+    name: $("mealName").value,
+    ingredients: $("mealIngredients").value
   };
   state.meals.push(meal);
   event.target.reset();
   saveState(`Scheduled ${meal.name}`);
 });
 
-document.getElementById("pantryForm").addEventListener("submit", (event) => {
+on("pantryForm", "submit", (event) => {
   event.preventDefault();
   const item = {
     id: crypto.randomUUID(),
-    name: document.getElementById("pantryName").value,
-    qty: Number(document.getElementById("pantryQty").value),
-    expiry: document.getElementById("pantryExpiry").value
+    name: $("pantryName").value,
+    qty: Number($("pantryQty").value),
+    expiry: $("pantryExpiry").value
   };
   state.pantry.push(item);
   event.target.reset();
   saveState(`Tracked pantry item ${item.name}`);
 });
 
-document.getElementById("budgetLimit").addEventListener("change", (event) => {
+on("budgetLimit", "change", (event) => {
   state.budgetLimit = Number(event.target.value);
   saveState(`Budget changed to ${formatMoney(state.budgetLimit)}`);
 });
 
-document.getElementById("productSearch").addEventListener("input", renderProducts);
-document.getElementById("resetProductCatalog")?.addEventListener("click", () => {
+on("productSearch", "input", renderProducts);
+on("resetProductCatalog", "click", () => {
   state.products = mergeDefaultProducts([]);
+  selectedProductCategory = "All";
+  if ($("productSearch")) {
+    $("productSearch").value = "";
+  }
   saveState("Restored default product catalog");
 });
 
-document.getElementById("productGrid").addEventListener("click", (event) => {
-  const productName = event.target.dataset.addProduct;
+on("productCategoryFilter", "click", (event) => {
+  const button = event.target.closest("[data-product-category]");
+  if (!button) return;
+  selectedProductCategory = button.dataset.productCategory || "All";
+  renderProducts();
+});
+
+on("productGrid", "click", (event) => {
+  const button = event.target.closest("[data-add-product]");
+  const productName = button?.dataset.addProduct;
   if (!productName) return;
   const product = state.products.find((item) => item.name === productName);
   if (!product) return;
   addProductToCart(product);
 });
 
-document.getElementById("settingsForm").addEventListener("submit", (event) => {
+on("settingsForm", "submit", (event) => {
   event.preventDefault();
   state.settings = {
-    diet: document.getElementById("dietSetting").value,
-    household: Number(document.getElementById("householdSetting").value),
-    store: document.getElementById("storeSetting").value,
-    allergies: document.getElementById("allergySetting").value
+    diet: $("dietSetting").value,
+    household: Number($("householdSetting").value),
+    store: $("storeSetting").value,
+    allergies: $("allergySetting").value
   };
   saveState("Settings updated");
 });
 
-document.getElementById("refreshRecs").addEventListener("click", () => {
+on("refreshRecs", "click", () => {
   saveState("Recommendations refreshed");
 });
 
-document.getElementById("addProductForm").addEventListener("submit", (event) => {
+on("addProductForm", "submit", (event) => {
   event.preventDefault();
-  const name = document.getElementById("productName").value.trim();
-  const category = document.getElementById("productCategory").value;
-  const price = Number(document.getElementById("productPrice").value);
-  const icon = document.getElementById("productIcon").value;
-  const nutrition = document.getElementById("productNutrition").value;
+  const name = $("productName").value.trim();
+  const category = $("productCategory").value;
+  const price = Number($("productPrice").value);
+  const icon = $("productIcon").value;
+  const nutrition = $("productNutrition").value;
 
-  // Check if product already exists
   if (state.products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
     alert("A product with this name already exists!");
     return;
@@ -888,12 +988,11 @@ document.getElementById("addProductForm").addEventListener("submit", (event) => 
     nutrition
   });
 
-  // Clear form
-  document.getElementById("addProductForm").reset();
+  event.target.reset();
   saveState(`Added ${name} to product catalog`);
 });
 
-document.getElementById("generateReceiptButton").addEventListener("click", () => {
+on("generateReceiptButton", "click", () => {
   const purchasedItems = state.grocery.filter(item => item.done);
   if (purchasedItems.length === 0) {
     alert("No purchased items to generate receipt for!");
@@ -903,22 +1002,22 @@ document.getElementById("generateReceiptButton").addEventListener("click", () =>
   const total = purchasedItems.reduce((sum, item) => sum + Number(item.price), 0);
   const customerName = state.user?.name || "Guest";
 
-  document.getElementById("receiptDate").textContent = new Date().toLocaleDateString();
-  document.getElementById("receiptCustomer").textContent = customerName;
-  document.getElementById("receiptItemsTable").innerHTML = purchasedItems.map(item => `
+  $("receiptDate").textContent = new Date().toLocaleDateString();
+  $("receiptCustomer").textContent = customerName;
+  $("receiptItemsTable").innerHTML = purchasedItems.map(item => `
     <tr>
-      <td>${item.name}</td>
-      <td>${item.qty}</td>
+      <td>${escapeHtml(item.name)}</td>
+      <td>${escapeHtml(item.qty)}</td>
       <td>${formatMoney(item.price / getQtyNumber(item.qty))}</td>
       <td>${formatMoney(item.price)}</td>
     </tr>
   `).join("");
-  document.getElementById("receiptTotal").textContent = formatMoney(total);
+  $("receiptTotal").textContent = formatMoney(total);
 
   saveState(`Generated receipt for ${purchasedItems.length} items`);
 });
 
-document.getElementById("clearPurchasedButton").addEventListener("click", () => {
+on("clearPurchasedButton", "click", () => {
   const purchasedCount = state.grocery.filter(item => item.done).length;
   if (purchasedCount === 0) {
     alert("No purchased items to clear!");
