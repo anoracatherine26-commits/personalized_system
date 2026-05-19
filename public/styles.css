@@ -1582,6 +1582,20 @@ tr:last-child td {
   margin: 18px 0 4px;
 }
 
+.product-status {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  margin-top: 14px;
+  border: 1px solid rgba(132, 65, 15, 0.14);
+  border-radius: 999px;
+  padding: 0 14px;
+  color: var(--brown);
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
 .product-category-filter button {
   min-height: 38px;
   border: 1px solid var(--line);

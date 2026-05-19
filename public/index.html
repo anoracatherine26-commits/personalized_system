@@ -40,8 +40,8 @@
         </div>
 
         <nav class="nav-list">
-          <button type="button" class="nav-link active" data-view="dashboard">Home</button>
-          <button type="button" class="nav-link" data-view="products">Product Menu</button>
+          <button type="button" class="nav-link" data-view="dashboard">Home</button>
+          <button type="button" class="nav-link active" data-view="products">Product Menu</button>
           <button type="button" class="nav-link" data-view="grocery">Grocery List</button>
           <button type="button" class="nav-link" data-view="receipt">Receipt</button>
           <button type="button" class="nav-link" data-view="meals">Meal Planner</button>
@@ -139,7 +139,7 @@
           </div>
         </section>
 
-        <section class="view active" id="dashboard">
+        <section class="view" id="dashboard">
           <section class="hero-section">
             <div class="hero-copy">
               <div class="hero-badge">AI-Powered <span></span> Smart <span></span> Personalized</div>
@@ -386,7 +386,7 @@
           </div>
         </section>
 
-        <section class="view" id="products">
+        <section class="view active" id="products">
           <div class="section-heading">
             <div>
               <p class="eyebrow">Catalog</p>
@@ -402,6 +402,7 @@
               <button type="button" class="primary-button" data-view-trigger="grocery">View Cart</button>
             </div>
           </div>
+          <div class="product-status" id="productStatus">Loading products...</div>
           <div class="product-category-filter" id="productCategoryFilter" aria-label="Product categories"></div>
           <form class="input-row admin-only hidden" id="addProductForm">
             <input id="productName" type="text" placeholder="Product name" required />
@@ -574,6 +575,6 @@
       </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=20260519-products-v2"></script>
   </body>
 </html>

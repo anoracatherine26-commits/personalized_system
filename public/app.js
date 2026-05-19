@@ -329,6 +329,12 @@ function normalizeState(nextState) {
   nextState.grocery = Array.isArray(nextState.grocery) && nextState.grocery.length > 0 ? nextState.grocery : defaultState.grocery;
   nextState.meals = Array.isArray(nextState.meals) && nextState.meals.length > 0 ? nextState.meals : defaultState.meals;
   nextState.pantry = Array.isArray(nextState.pantry) && nextState.pantry.length > 0 ? nextState.pantry : defaultState.pantry;
+  nextState.activity = Array.isArray(nextState.activity) ? nextState.activity : [...defaultState.activity];
+  nextState.settings = nextState.settings && typeof nextState.settings === "object"
+    ? { ...defaultState.settings, ...nextState.settings }
+    : { ...defaultState.settings };
+  nextState.budgetLimit = Number.isFinite(Number(nextState.budgetLimit)) ? Number(nextState.budgetLimit) : defaultState.budgetLimit;
+  nextState.currency = nextState.currency || defaultState.currency;
 
   if (nextState.user && !nextState.user.role) {
     nextState.user.role = "User";
@@ -356,6 +362,7 @@ function normalizeState(nextState) {
 
 function saveState(activity) {
   if (activity) {
+    state.activity = Array.isArray(state.activity) ? state.activity : [];
     state.activity = [activity, ...state.activity].slice(0, 8);
   }
   localStorage.setItem(storageKey, JSON.stringify(state));
@@ -654,6 +661,11 @@ function renderProducts() {
   const cartItemCount = getCartItemCount();
   $("cartCount").textContent = `${cartItemCount} item${cartItemCount === 1 ? "" : "s"}`;
   $("cartTotal").textContent = formatMoney(getGroceryTotal());
+  const status = $("productStatus");
+  if (status) {
+    const categoryLabel = selectedProductCategory === "All" ? "all categories" : selectedProductCategory;
+    status.textContent = `Showing ${filtered.length} of ${state.products.length} products in ${categoryLabel}`;
+  }
   const grid = $("productGrid");
   if (filtered.length === 0) {
     grid.innerHTML = `<div class="empty-state">No products found. Clear search, choose All, or reset the catalog.</div>`;
@@ -750,18 +762,26 @@ function renderProfile() {
 
 }
 
+function renderSection(name, callback) {
+  try {
+    callback();
+  } catch (error) {
+    console.error(`Unable to render ${name}`, error);
+  }
+}
+
 function render() {
-  renderDashboard();
-  renderGrocery();
-  renderMeals();
-  renderPantry();
-  renderBudget();
-  renderProducts();
-  renderPrices();
-  renderRecommendations();
-  renderNotifications();
-  renderSettings();
-  renderProfile();
+  renderSection("dashboard", renderDashboard);
+  renderSection("grocery list", renderGrocery);
+  renderSection("meal planner", renderMeals);
+  renderSection("pantry", renderPantry);
+  renderSection("budget", renderBudget);
+  renderSection("products", renderProducts);
+  renderSection("prices", renderPrices);
+  renderSection("recommendations", renderRecommendations);
+  renderSection("notifications", renderNotifications);
+  renderSection("settings", renderSettings);
+  renderSection("profile", renderProfile);
 }
 
 document.addEventListener("click", (event) => {
