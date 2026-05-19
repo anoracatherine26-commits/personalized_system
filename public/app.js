@@ -307,6 +307,13 @@ function on(id, eventName, handler) {
   return element;
 }
 
+window.addEventListener("error", (event) => {
+  const status = $("productStatus");
+  if (status && status.textContent === "Loading products...") {
+    status.textContent = `Product menu script error: ${event.message}`;
+  }
+});
+
 function loadState() {
   const saved = localStorage.getItem(storageKey);
   if (!saved) return structuredClone(defaultState);
@@ -784,6 +791,8 @@ function render() {
   renderSection("profile", renderProfile);
 }
 
+render();
+
 document.addEventListener("click", (event) => {
   const profileButton = event.target.closest("[data-profile-open]");
   if (profileButton) {
@@ -1049,5 +1058,3 @@ on("clearPurchasedButton", "click", () => {
     saveState(`Cleared ${purchasedCount} purchased items`);
   }
 });
-
-render();
