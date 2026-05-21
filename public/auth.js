@@ -120,8 +120,9 @@ document.getElementById("loginForm").addEventListener("submit", (event) => {
   account.lastLoginAt = state.user.lastLoginAt;
   saveState(state);
 
-  window.location.href = state.user.role === "Admin" ? "admin.html" : "index.html";
+  window.location.href = "home.html";
 });
+
 
 // Register form handler
 document.getElementById("registerForm").addEventListener("submit", (event) => {
@@ -162,5 +163,6 @@ document.getElementById("registerForm").addEventListener("submit", (event) => {
 
   saveState(state);
 
-  window.location.href = state.user.role === "Admin" ? "admin.html" : "index.html";
+  window.location.href = "home.html";
 });
+

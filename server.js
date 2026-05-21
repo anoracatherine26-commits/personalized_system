@@ -24,16 +24,18 @@ app.use(express.static(publicDir));
 
 // Home route
 app.get("/", (req, res) => {
-  res.sendFile(path.join(publicDir, "index.html"));
+  res.sendFile(path.join(publicDir, "home.html"));
 });
+
 
 app.get("/login", (req, res) => {
   res.sendFile(path.join(publicDir, "login.html"));
 });
 
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(publicDir, "admin.html"));
+  res.sendFile(path.join(publicDir, "home.html"));
 });
+
 
 // Example API route (you can delete or modify this)
 app.get("/api", (req, res) => {

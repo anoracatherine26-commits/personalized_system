@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - GroceryAI</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        background: #f8fafc;
+        color: #0f172a;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px 16px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(2, 6, 23, 0.05);
+      }
+      h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .sub {
+        margin-top: 6px;
+        color: #475569;
+      }
+      .grid {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+      .stat {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 14px;
+        background: #fbfdff;
+      }
+      .stat strong {
+        display: block;
+        font-size: 20px;
+        margin-top: 4px;
+      }
+      .btnrow { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+      .btn {
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 10px 14px;
+        background: #fff;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn.primary {
+        border-color: #2563eb;
+        background: #2563eb;
+        color: #fff;
+      }
+      .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap: 16px;">
+          <div>
+            <h1>HOME Dashboard</h1>
+            <div class="sub" id="welcome">Loading...</div>
+          </div>
+          <div>
+            <span class="pill" id="rolePill">-</span>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="stat">
+            <span>Products in catalog</span>
+            <strong id="productsCount">0</strong>
+          </div>
+          <div class="stat">
+            <span>Your grocery list items</span>
+            <strong id="groceryCount">0</strong>
+          </div>
+          <div class="stat">
+            <span>Your pantry items</span>
+            <strong id="pantryCount">0</strong>
+          </div>
+          <div class="stat">
+            <span>Budget limit</span>
+            <strong id="budgetLimit">₱0</strong>
+          </div>
+        </div>
+
+        <div class="btnrow">
+          <button class="btn primary" type="button" id="goLogin">Go to Login</button>
+          <button class="btn" type="button" id="logoutBtn">Logout</button>
+        </div>
+
+        <p style="margin-top:14px; color:#64748b; font-size:14px;">
+          This project currently exposes only Login/Register + this Home page.
+          The full grocery dashboards are intentionally hidden.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const storageKey = "personalized-grocery-ai-state";
+        const elWelcome = document.getElementById('welcome');
+        const elRole = document.getElementById('rolePill');
+        const elProducts = document.getElementById('productsCount');
+        const elGrocery = document.getElementById('groceryCount');
+        const elPantry = document.getElementById('pantryCount');
+        const elBudget = document.getElementById('budgetLimit');
+
+        function fmtPHP(v) {
+          try {
+            return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(v);
+          } catch {
+            return `₱${Number(v || 0).toFixed(2)}`;
+          }
+        }
+
+        function loadState() {
+          try {
+            return JSON.parse(localStorage.getItem(storageKey)) || {};
+          } catch {
+            return {};
+          }
+        }
+
+        const state = loadState();
+        const user = state.user;
+
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        elWelcome.textContent = `Welcome, ${user.name || 'User'}!`;
+        elRole.textContent = user.role || 'User';
+
+        elProducts.textContent = Array.isArray(state.products) ? state.products.length : 0;
+        elGrocery.textContent = Array.isArray(state.grocery) ? state.grocery.length : 0;
+        elPantry.textContent = Array.isArray(state.pantry) ? state.pantry.length : 0;
+        elBudget.textContent = fmtPHP(state.budgetLimit || 0);
+
+        document.getElementById('goLogin').addEventListener('click', () => {
+          window.location.href = 'login.html';
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          const s = loadState();
+          s.user = null;
+          localStorage.setItem(storageKey, JSON.stringify(s));
+          window.location.href = 'login.html';
+        });
+      })();
+    </script>
+  </body>
+</html>
+
