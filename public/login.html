@@ -4,25 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Personalized Grocery AI</title>
+    <link rel="stylesheet" href="styles.css" />
     <style>
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
-            --bg: #f8fafc;
-            --card: #ffffff;
+            --bg: transparent;
+            --card: rgba(255, 255, 255, 0.78);
             --text: #1e293b;
-            --border: #e2e8f0;
+            --border: rgba(226, 232, 240, 0.9);
         }
+
         body {
             font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg);
             color: var(--text);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
+            background: transparent;
+            position: relative;
         }
+
         .auth-container {
             width: 100%;
             max-width: 400px;
@@ -99,7 +103,18 @@
     </style>
 </head>
 <body>
+    <div class="page-art" aria-hidden="true">
+      <span class="ring ring-one"></span>
+      <span class="ring ring-two"></span>
+      <span class="dot dot-one"></span>
+      <span class="dot dot-two"></span>
+      <span class="dot dot-three"></span>
+      <span class="leaf leaf-left"></span>
+      <span class="leaf leaf-right"></span>
+    </div>
+
     <div class="auth-container">
+
         <div class="auth-header">
             <h1>🛒 Grocery AI</h1>
             <p>Manage your pantry and budget</p>
@@ -116,7 +131,7 @@
                 <div class="form-group"><label>Password</label><input type="password" id="loginPassword" required placeholder="••••••••"></div>
                 <button type="submit">Sign In</button>
             </form>
-        </div>
+     </div>
 
         <div id="registerPanel" class="hidden">
             <form id="registerForm">
@@ -129,6 +144,7 @@
         </div>
     </div>
 
-    <script src="auth.js"></script>
+    <script src="_api.js" type="module"></script>
+    <script src="auth.js" type="module"></script>
 </body>
 </html>
