@@ -202,9 +202,16 @@ app.post("/api/auth/register", (req, res) => {
   });
 
   // default settings + budget
-  db.prepare(
-    "INSERT INTO settings (user_id, diet, household, store, allergies, currency) VALUES (?,?,?,?,?,?, 'PHP')"
-  ).run(info.lastInsertRowid, "Balanced", 3, "BudgetBasket", "");
+db.prepare(
+  "INSERT INTO settings (user_id, diet, household, store, allergies, currency) VALUES (?,?,?,?,?,?)"
+).run(
+  info.lastInsertRowid,
+  "Balanced",
+  3,
+  "BudgetBasket",
+  "",
+  "PHP"
+);
   db.prepare("INSERT INTO budget (user_id, budget_limit) VALUES (?, ?)").run(info.lastInsertRowid, 6500);
   db.prepare("INSERT INTO notifications (user_id, reviewed_at, created_at) VALUES (?, NULL, ?)").run(info.lastInsertRowid, now);
 
