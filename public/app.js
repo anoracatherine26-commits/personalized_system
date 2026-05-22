@@ -1,4 +1,6 @@
-const storageKey = "personalized-grocery-ai-state";
+import { apiFetch, ensureLoggedIn } from "./_api.js";
+
+const storageKey = "personalized-grocery-ai-state"; // legacy (no longer used for API persistence)
 
 window.addEventListener("error", (event) => {
   const status = document.getElementById("productStatus");
@@ -6,6 +8,7 @@ window.addEventListener("error", (event) => {
     status.textContent = `Product menu script error: ${event.message}`;
   }
 });
+
 
 function createId() {
   if (globalThis.crypto && typeof globalThis.crypto.randomUUID === "function") {
@@ -383,6 +386,63 @@ const defaultState = {
 
 let state = loadState();
 let selectedProductCategory = "All";
+
+async function initApiBackedState() {
+  // If user isn’t logged in, keep current behavior (redirect happens in switchView(profile))
+  // but we still avoid API calls that would 401.
+  try {
+    const user = await ensureLoggedIn();
+    state.user = user;
+  } catch {
+    // no-op: user not logged in yet
+    return;
+  }
+
+// Fetch core lists from backend
+  const [productsRes, groceryRes, pantryRes, mealsRes, budgetRes, settingsRes, notificationsRes] = await Promise.all([
+
+    apiFetch("/api/products"),
+    apiFetch("/api/grocery"),
+    apiFetch("/api/pantry"),
+    apiFetch("/api/meals"),
+    apiFetch("/api/budget"),
+    apiFetch("/api/settings"),
+    apiFetch("/api/notifications")
+  ]);
+
+  state.products = productsRes.products || [];
+  state.grocery = (groceryRes.grocery || []).map((x) => ({
+    id: String(x.id),
+    name: x.name,
+    qty: String(x.qty),
+    price: Number(x.price) || 0,
+    category: x.category,
+    done: Boolean(x.done)
+  }));
+  state.pantry = (pantryRes.pantry || []).map((x) => ({
+    id: String(x.id),
+    name: x.name,
+    qty: x.qty,
+    expiry: x.expiry
+  }));
+  state.meals = (mealsRes.meals || []).map((x) => ({
+    id: String(x.id),
+    day: x.day,
+    name: x.name,
+    ingredients: x.ingredients
+  }));
+
+  state.budgetLimit = Number(budgetRes.budget?.budget_limit ?? state.budgetLimit);
+  state.settings = settingsRes.settings || state.settings;
+
+  // notifications are computed by backend; we store for render()
+  state.notificationsReviewedAt = null; // backend marks reviewed via endpoint; current UI uses this flag
+  state._serverNotifications = notificationsRes.notifications || [];
+
+  // Keep legacy currency + seeds
+  state.currency = "PHP";
+}
+
 
 function $(id) {
   return document.getElementById(id);
@@ -914,7 +974,9 @@ function render() {
   renderSection("profile", renderProfile);
 }
 
+// Render once (legacy state), then refresh from API if logged in.
 render();
+initApiBackedState().then(() => render()).catch(() => render());
 
 document.addEventListener("click", (event) => {
   const profileButton = event.target.closest("[data-profile-open]");
@@ -932,12 +994,13 @@ document.addEventListener("click", (event) => {
 
   const view = button.dataset.view || button.dataset.viewTrigger;
   if (view === "auth") {
-    window.location.href = "login.html";
+window.location.href = "login.html";
     return;
   }
 
   switchView(view);
 });
+
 
 window.addEventListener("load", () => {
   const allButtons = document.querySelectorAll("[data-view], [data-view-trigger], [data-profile-open]");
@@ -1015,114 +1078,172 @@ on("logoutButton", "click", () => {
   window.location.href = "login.html";
 });
 
-on("groceryForm", "submit", (event) => {
+on("groceryForm", "submit", async (event) => {
   event.preventDefault();
   const name = $("groceryName").value.trim();
   const product = state.products.find((item) => item.name.toLowerCase() === name.toLowerCase());
-  state.grocery.push({
-    id: createId(),
-    name,
-    qty: $("groceryQty").value,
-    price: Number($("groceryPrice").value),
-    category: product?.category || "General",
-    done: false
+
+  await apiFetch("/api/grocery", {
+    method: "POST",
+    body: {
+      name,
+      qty: $("groceryQty").value,
+      price: Number($("groceryPrice").value),
+      category: product?.category || "General"
+    }
   });
+
   event.target.reset();
-  saveState(`Added ${name} to grocery list`);
+  await initApiBackedState();
+  render();
 });
 
-on("groceryTable", "click", (event) => {
+
+on("groceryTable", "click", async (event) => {
   const toggleId = event.target.dataset.toggleItem;
   const deleteId = event.target.dataset.deleteItem;
   const incrementId = event.target.dataset.incrementItem;
   const decrementId = event.target.dataset.decrementItem;
+
   if (toggleId) {
     const item = state.grocery.find((entry) => entry.id === toggleId);
     if (!item) return;
-    item.done = !item.done;
-    saveState(`${item.name} marked ${item.done ? "bought" : "needed"}`);
+
+    // Patch done flag only; API stores qty + unit_price.
+    await apiFetch(`/api/grocery/${toggleId}`, {
+      method: "PATCH",
+      body: { done: !item.done, qty: item.qty }
+    });
+    await initApiBackedState();
+    render();
+    return;
   }
+
   if (incrementId || decrementId) {
     const id = incrementId || decrementId;
     const item = state.grocery.find((entry) => entry.id === id);
-    const product = item && state.products.find((entry) => entry.name.toLowerCase() === item.name.toLowerCase());
     if (!item) return;
+
     const currentQty = getQtyNumber(item.qty);
     const nextQty = incrementId ? currentQty + 1 : Math.max(1, currentQty - 1);
-    const unitPrice = product?.price || Number(item.price || 0) / currentQty || 0;
-    item.qty = String(nextQty);
-    item.price = Number((unitPrice * nextQty).toFixed(2));
-    saveState(`Updated ${item.name} quantity to ${nextQty}`);
+
+    // API expects qty + done; price recalculation isn’t supported by API patch.
+    // We keep done as-is.
+    await apiFetch(`/api/grocery/${id}`, {
+      method: "PATCH",
+      body: { done: item.done, qty: nextQty }
+    });
+
+    await initApiBackedState();
+    render();
+    return;
   }
+
   if (deleteId) {
-    const item = state.grocery.find((entry) => entry.id === deleteId);
-    state.grocery = state.grocery.filter((entry) => entry.id !== deleteId);
-    saveState(`Removed ${item?.name || "item"} from grocery list`);
+    await apiFetch(`/api/grocery/${deleteId}`, { method: "DELETE" });
+    await initApiBackedState();
+    render();
+    return;
   }
 });
 
-on("markAllBoughtButton", "click", () => {
-  state.grocery = state.grocery.map((item) => ({ ...item, done: true }));
-  saveState("Marked all grocery items as bought");
+
+on("markAllBoughtButton", "click", async () => {
+  const pending = state.grocery.filter((x) => !x.done);
+  await Promise.all(
+    pending.map((item) =>
+      apiFetch(`/api/grocery/${item.id}`, {
+        method: "PATCH",
+        body: { done: 1, qty: item.qty }
+      })
+    )
+  );
+  await initApiBackedState();
+  render();
 });
 
-on("clearCartButton", "click", () => {
+
+
+on("clearCartButton", "click", async () => {
   if (state.grocery.length === 0) {
     alert("Your cart is already empty.");
     return;
   }
-  if (confirm("Clear all grocery items from your cart?")) {
-    state.grocery = [];
-    saveState("Cleared grocery cart");
-  }
+  if (!confirm("Clear all grocery items from your cart?")) return;
+
+  await Promise.all(state.grocery.map((item) => apiFetch(`/api/grocery/${item.id}`, { method: "DELETE" })));
+  await initApiBackedState();
+  render();
 });
 
-on("mealForm", "submit", (event) => {
+
+
+on("mealForm", "submit", async (event) => {
   event.preventDefault();
-  const meal = {
-    id: createId(),
-    day: $("mealDay").value,
-    name: $("mealName").value,
-    ingredients: $("mealIngredients").value
-  };
-  state.meals.push(meal);
+
+  await apiFetch("/api/meals", {
+    method: "POST",
+    body: {
+      day: $("mealDay").value,
+      name: $("mealName").value,
+      ingredients: $("mealIngredients").value
+    }
+  });
+
   event.target.reset();
-  saveState(`Scheduled ${meal.name}`);
+  await initApiBackedState();
+  render();
 });
 
-on("mealGrid", "click", (event) => {
+
+on("mealGrid", "click", async (event) => {
   const mealId = event.target.dataset.deleteMeal;
   if (!mealId) return;
-  const meal = state.meals.find((entry) => entry.id === mealId);
-  state.meals = state.meals.filter((entry) => entry.id !== mealId);
-  saveState(`Removed meal ${meal?.name || ""}`.trim());
+
+  await apiFetch(`/api/meals/${mealId}`, { method: "DELETE" });
+  await initApiBackedState();
+  render();
 });
 
-on("pantryForm", "submit", (event) => {
+
+on("pantryForm", "submit", async (event) => {
   event.preventDefault();
-  const item = {
-    id: createId(),
-    name: $("pantryName").value,
-    qty: Number($("pantryQty").value),
-    expiry: $("pantryExpiry").value
-  };
-  state.pantry.push(item);
+
+  await apiFetch("/api/pantry", {
+    method: "POST",
+    body: {
+      name: $("pantryName").value,
+      qty: Number($("pantryQty").value),
+      expiry: $("pantryExpiry").value
+    }
+  });
+
   event.target.reset();
-  saveState(`Tracked pantry item ${item.name}`);
+  await initApiBackedState();
+  render();
 });
 
-on("pantryGrid", "click", (event) => {
+
+on("pantryGrid", "click", async (event) => {
   const pantryId = event.target.dataset.deletePantry;
   if (!pantryId) return;
-  const item = state.pantry.find((entry) => entry.id === pantryId);
-  state.pantry = state.pantry.filter((entry) => entry.id !== pantryId);
-  saveState(`Removed pantry item ${item?.name || ""}`.trim());
+
+  await apiFetch(`/api/pantry/${pantryId}`, { method: "DELETE" });
+  await initApiBackedState();
+  render();
 });
 
-on("budgetLimit", "change", (event) => {
-  state.budgetLimit = Number(event.target.value);
-  saveState(`Budget changed to ${formatMoney(state.budgetLimit)}`);
+
+on("budgetLimit", "change", async (event) => {
+  const budget_limit = Number(event.target.value);
+  await apiFetch("/api/budget", {
+    method: "PUT",
+    body: { budget_limit }
+  });
+  await initApiBackedState();
+  render();
 });
+
 
 on("productSearch", "input", renderProducts);
 on("resetProductCatalog", "click", () => {
@@ -1172,39 +1293,54 @@ on("refreshPricesButton", "click", () => {
   saveState("Price comparison refreshed");
 });
 
-on("settingsForm", "submit", (event) => {
+on("settingsForm", "submit", async (event) => {
   event.preventDefault();
-  state.settings = {
-    diet: $("dietSetting").value,
-    household: Number($("householdSetting").value),
-    store: $("storeSetting").value,
-    allergies: $("allergySetting").value
-  };
-  state.recommendationSeed += 1;
+
+  await apiFetch("/api/settings", {
+    method: "PUT",
+    body: {
+      diet: $("dietSetting").value,
+      household: Number($("householdSetting").value),
+      store: $("storeSetting").value,
+      allergies: $("allergySetting").value
+    }
+  });
+
   selectedProductCategory = "All";
-  if ($("productSearch")) {
-    $("productSearch").value = "";
-  }
-  saveState("Settings updated");
+  if ($("productSearch")) $("productSearch").value = "";
+
+  await initApiBackedState();
+  render();
   switchView("recommendations");
 });
 
-on("refreshRecs", "click", () => {
+
+on("refreshRecs", "click", async () => {
   state.recommendationSeed += 1;
-  saveState("Recommendations refreshed");
+  await initApiBackedState();
+  render();
 });
 
-on("refreshRecommendationsPage", "click", () => {
+
+on("refreshRecommendationsPage", "click", async () => {
   state.recommendationSeed += 1;
-  saveState("Recommendation picks refreshed");
+  await initApiBackedState();
+  render();
 });
 
-on("resolveNotificationsButton", "click", () => {
-  state.notificationsReviewedAt = new Date().toISOString();
-  saveState("Notifications marked reviewed");
+
+
+on("resolveNotificationsButton", "click", async () => {
+  await apiFetch("/api/notifications/mark-reviewed", {
+    method: "POST",
+    body: {}
+  });
+  await initApiBackedState();
+  render();
 });
 
-on("addProductForm", "submit", (event) => {
+
+on("addProductForm", "submit", async (event) => {
   event.preventDefault();
   const name = $("productName").value.trim();
   const category = $("productCategory").value;
@@ -1212,22 +1348,18 @@ on("addProductForm", "submit", (event) => {
   const icon = $("productIcon").value;
   const nutrition = $("productNutrition").value;
 
-  if (state.products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-    alert("A product with this name already exists!");
-    return;
-  }
+  if (!name) return;
 
-  state.products.push({
-    name,
-    category,
-    price,
-    icon,
-    nutrition
+  await apiFetch("/api/products", {
+    method: "POST",
+    body: { name, category, price, icon, nutrition }
   });
 
   event.target.reset();
-  saveState(`Added ${name} to product catalog`);
+  await initApiBackedState();
+  render();
 });
+
 
 on("generateReceiptButton", "click", () => {
   const purchasedItems = state.grocery.filter(item => item.done);

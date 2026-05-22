@@ -138,6 +138,9 @@ app.use(
 
 app.use(express.static(publicDir));
 
+// Always allow same-site cookie session in browsers.
+// (cookie-session is set with sameSite:lax in this project)
+
 function requireAuth(req, res, next) {
   if (!req.session?.userId) return res.status(401).json({ error: "Unauthorized" });
   return next();
@@ -150,6 +153,7 @@ function requireAdmin(req, res, next) {
   if (me.role !== "Admin") return res.status(403).json({ error: "Forbidden" });
   return next();
 }
+
 
 function mePayload(user) {
   return {

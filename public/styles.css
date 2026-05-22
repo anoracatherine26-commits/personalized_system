@@ -22,7 +22,7 @@
 }
 
 body {
-  background-image: url("file:///C:/Users/HP/AppData/Roaming/Code/User/workspaceStorage/vscode-chat-images/image-1779375237827.png");
+background-image: url("/assets/image-1779375237827.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
